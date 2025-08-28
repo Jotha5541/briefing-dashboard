@@ -10,7 +10,7 @@ class handler(BaseHTTPRequestHandler):
         api_key = os.environ.get('WEATHER_API_KEY')
         
         query_components = parse_qs(urlparse(self.path).query)
-        city = query_components.get('city', ['London'])[0]      # Testing city
+        city = query_components.get('city', ['Corona'])[0]      # Testing city
         encoded_city = quote(city)
         
         url = f"https://api.openweathermap.org/data/2.5/weather?q={encoded_city}&appid={api_key}&units=imperial"
