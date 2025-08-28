@@ -3,6 +3,7 @@ import json
 import os
 import requests
 from urllib.parse import parse_qs, urlparse
+from urllib.parse import quote
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -10,8 +11,9 @@ class handler(BaseHTTPRequestHandler):
         
         query_components = parse_qs(urlparse(self.path).query)
         city = query_components.get('city', ['Corona, CA'])[0]
+        encoded_city = quote(city)
         
-        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=imperial"
+        url = f"https://api.openweathermap.org/data/2.5/weather?q={encoded_city}&appid={api_key}&units=imperial"
         
         print(f"API Key Received: {api_key}")
         
