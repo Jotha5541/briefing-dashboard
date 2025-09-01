@@ -8,6 +8,17 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
+function WeatherComponent() {
+  return (
+    <div className="WeatherComponent">
+      <h2>Weather Information</h2>
+      <WeatherWidget />
+    </div>
+  );
+}
+
+
+
 function App() {
   const [session, setSession] = useState(null);
   const [ loading, setLoading ] = useState(true);
@@ -61,12 +72,7 @@ function App() {
       { /* Route 2: Dashboard Page ('/dashboard') */}
       <Route path="/dashboard" element={
         session ? (   // No session -> show nothing : Session -> Dashboard
-          <div className="App">
-            <header className="App-header">
-              <h1>Daily Briefing Dashboard</h1>
-              <WeatherWidget />
-            </header>
-          </div>
+          <WeatherComponent />
         ) : null
       } />
     </Routes>
