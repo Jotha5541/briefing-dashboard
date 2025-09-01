@@ -72,7 +72,7 @@ function App() {
       { /* Route 2: Dashboard Page ('/dashboard') */}
       <Route path="/dashboard" element={
         session ? (   // No session -> show nothing : Session -> Dashboard
-          <WeatherComponent />
+          <WeatherComponent session={session}/>
         ) : null
       } />
     </Routes>
