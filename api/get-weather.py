@@ -17,6 +17,8 @@ class handler(BaseHTTPRequestHandler):
         try:
             response = requests.get(url)
             
+            print(f"Request URL: {url}")
+            
             if response.status_code == 200:
                 # Success: Sends weather data
                 weather_data = response.json()

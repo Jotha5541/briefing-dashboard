@@ -40,12 +40,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "vercel": {
-    "functions": {
-      "api/**/*.py": {
-        "runtime": "python3.9"
-      }
-    }
   }
 }
