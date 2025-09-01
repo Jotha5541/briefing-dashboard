@@ -17,10 +17,8 @@ function WeatherComponent() {
   );
 }
 
-
-
 function App() {
-  const [session, setSession] = useState(null);
+  const [ session, setSession ] = useState(null);
   const [ loading, setLoading ] = useState(true);
   const navigate = useNavigate();
 
