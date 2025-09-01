@@ -1,46 +1,43 @@
-from http.server import BaseHTTPRequestHandler
 import json
 import os
 import requests
-from urllib.parse import parse_qs, urlparse
-from urllib.parse import quote
+from urllib.parse import parse_qs, urlparse, quote
 
-class handler(BaseHTTPRequestHandler):
-    def do_GET(self):
-        api_key = os.environ.get('WEATHER_API_KEY')
-        
-        query_components = parse_qs(urlparse(self.path).query)
-        city = quote(query_components.get('city', ['Corona'])[0])
-        
-        url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=imperial"
-        
-        try:
-            response = requests.get(url)
-            
-            print(f"Request URL: {url}")
-            
-            if response.status_code == 200:
-                # Success: Sends weather data
-                weather_data = response.json()
-                self.send_response(200)
-                self.send_header("Content-Type", "application/json")
-                self.send_header('Access-Control-Allow-Origin', '*')    # CORS header
-                self.end_headers()
-                self.wfile.write(json.dumps(weather_data).encode('utf-8'))
-            else:    
-                print(f"OpenWeatherMap API Error: {response.status_code} - {response.text}")
-                self.send_response(response.status_code)
-                self.send_header('Content-type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                error_message = {"error": "Failed to fetch weather data from provider.", "provider_error": response.json()}
-                self.wfile.write(json.dumps(error_message).encode('utf-8'))
-            
-        except requests.exceptions.RequestException as e:
-            self.send_response(502)
-            self.send_header('Content_type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps({"error": str(e)}).encode('utf-8'))
-            
-        return
-            
+def handler(event, context):
+    api_key = os.environ.get("WEATHER_API_KEY")
+
+    # Default city = Corona
+    query = parse_qs(urlparse(event["rawPath"] + "?" + event.get("rawQueryString", "")).query)
+    city = quote(query.get("city", ["Corona"])[0])
+
+    url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=imperial"
+
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return {
+                "statusCode": 200,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                },
+                "body": json.dumps(response.json()),
+            }
+        else:
+            return {
+                "statusCode": response.status_code,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Access-Control-Allow-Origin": "*",
+                },
+                "body": json.dumps({
+                    "error": "Failed to fetch weather data",
+                    "provider_error": response.text,
+                }),
+            }
+    except requests.exceptions.RequestException as e:
+        return {
+            "statusCode": 502,
+            "headers": {"Content-Type": "application/json"},
+            "body": json.dumps({"error": str(e)}),
+        }
