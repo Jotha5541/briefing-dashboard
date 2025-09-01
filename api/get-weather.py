@@ -17,7 +17,15 @@ class handler(BaseHTTPRequestHandler):
         try:
             response = requests.get(url)
             
-            if response.status_code != 200:
+            if response.status_code == 200:
+                # Success: Sends weather data
+                weather_data = response.json()
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header('Access-Control-Allow-Origin', '*')    # CORS header
+                self.end_headers()
+                self.wfile.write(json.dumps(weather_data).encode('utf-8'))
+            else:    
                 print(f"OpenWeatherMap API Error: {response.status_code} - {response.text}")
                 self.send_response(response.status_code)
                 self.send_header('Content-type', 'application/json')
@@ -25,14 +33,6 @@ class handler(BaseHTTPRequestHandler):
                 self.end_headers()
                 error_message = {"error": "Failed to fetch weather data from provider.", "provider_error": response.json()}
                 self.wfile.write(json.dumps(error_message).encode('utf-8'))
-            
-            # Success: Sends weather data
-            weather_data = response.json()
-            self.send_response(200)
-            self.send_header("Content-Type", "application/json")
-            self.send_header('Access-Control-Allow-Origin', '*')    # CORS header
-            self.end_headers()
-            self.wfile.write(json.dumps(weather_data).encode('utf-8'))
             
         except requests.exceptions.RequestException as e:
             self.send_response(502)
