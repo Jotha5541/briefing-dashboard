@@ -1,12 +1,12 @@
 import './App.css'; // Used for styling login page 
 
 import WeatherWidget from './components/WeatherWidget';
+import supabase from './supabaseClient';
 
 import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-import { supabase } from './supabaseClient';
 
 function App() {
   const [session, setSession] = useState(null);
