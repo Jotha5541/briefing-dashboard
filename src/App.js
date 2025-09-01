@@ -40,10 +40,27 @@ function App() {
     }, [navigate]);
 
   return (
-
     <Routes>
       {/* Route 1: Login Page ('/') */}
-      
+      <Route path="/" element={
+        !session ? (  // No session -> Login Form : Session -> show nothing
+          <div style={{ width: '320px', margin: '50px auto' }}>
+            <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
+          </div>
+        ) : null
+      } />
+
+      { /* Route 2: Dashboard Page ('/dashboard') */}
+      <Route path="/dashboard" element={
+        session ? (   // No session -> show nothing : Session -> Dashboard
+          <div className="App">
+            <header className="App-header">
+              <h1>Daily Briefing Dashboard</h1>
+              <WeatherWidget />
+            </header>
+          </div>
+        ) : null
+      } />
     </Routes>
 
 
