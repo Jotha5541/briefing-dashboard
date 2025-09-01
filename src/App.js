@@ -10,16 +10,20 @@ import { ThemeSupa } from '@supabase/auth-ui-shared';
 
 function App() {
   const [session, setSession] = useState(null);
+  const [ loading, setLoading ] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     /* Check for existing session when app first loads */
+    setLoading(true);   // Start loading check
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
 
       if (session) {  // Directs to dashboard if session exists
         navigate('/dashboard');
       }
+    }).finally(() => {
+      setLoading(false);    // End loading check
     });
 
     /* Listen for login/logout events */
@@ -37,6 +41,11 @@ function App() {
     return () =>
       subscription.unsubscribe();
     }, [navigate]);
+
+    
+    if (loading) {
+      return <div>Loading . . . </div>;
+    }
 
   return (
     <Routes>
