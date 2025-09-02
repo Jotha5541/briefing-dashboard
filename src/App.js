@@ -13,6 +13,14 @@ function WeatherComponent() {
     <div className="WeatherComponent">
       <h2>Weather Information</h2>
       <WeatherWidget />
+
+      {/* Testing Purpose Only: Logout Button */}
+      <button onClick={() => supabase.auth.signOut()}
+      style={{ marginTop: '20px', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}
+      >
+      Logout
+      </button>
+      
     </div>
   );
 }
@@ -79,14 +87,5 @@ function App() {
   );
 }
 
-/*
-    <div className="App">
-      <header className="App-header">
-        <h1>Daily Briefing Dashboard</h1>
-        <WeatherWidget />
-      </header>
-    </div>
-  );
-*/
 
 export default App;
