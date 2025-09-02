@@ -8,7 +8,7 @@ function WeatherWidget() {
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                const apiUrl = `/api/get-weather?city=Corona`;
+                const apiUrl = `/api/get-weather?city=Corona`;  // Change to dynamic later
                 const response = await axios.get(apiUrl);
                 setWeatherData(response.data);
             }
