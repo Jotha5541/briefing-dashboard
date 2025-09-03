@@ -1,28 +1,26 @@
 import fetch from "node-fetch";
 
-export default async function handler(req, res) {
-  const { city = "Corona" } = req.query; // default to Corona if no city
+export default async function handler(request, res) {
+  const { city = "Corona" } = request.query; // Hard-coding city for now
   const apiKey = process.env.WEATHER_API_KEY;
 
   if (!apiKey) {
     return res.status(500).json({ error: "Missing WEATHER_API_KEY in environment" });
   }
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(
-    city
-  )}&appid=${apiKey}&units=imperial`;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=imperial`;
 
   try {
-    const response = await fetch(url);
+    const res = await fetch(url);
 
-    if (!response.ok) {
-      const errorText = await response.text();
+    if (!res.ok) {
+      const errorText = await res.text();
       return res
-        .status(response.status)
+        .status(res.status)
         .json({ error: "Failed to fetch weather data", provider_error: errorText });
     }
 
-    const data = await response.json();
+    const data = await res.json();
 
     res.setHeader("Access-Control-Allow-Origin", "*"); // CORS header
     return res.status(200).json(data);
