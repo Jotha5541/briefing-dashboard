@@ -8,22 +8,22 @@ export default async function handler(request, res) {
     return res.status(500).json({ error: "Missing WEATHER_API_KEY in environment" });
   }
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=imperial`;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${(city)}&appid=${apiKey}&units=imperial`;
 
   try {
-    const res = await fetch(url);
+    const response = await fetch(url);
 
-    if (!res.ok) {
-      const errorText = await res.text();
+    if (!response.ok) {
+      const errorText = await response.text();
       return res
-        .status(res.status)
+        .status(response.status)
         .json({ error: "Failed to fetch weather data", provider_error: errorText });
     }
 
-    const data = await res.json();
+    const weatherData = await response.json();
 
     res.setHeader("Access-Control-Allow-Origin", "*"); // CORS header
-    return res.status(200).json(data);
+    return res.status(200).json(weatherData);
   } catch (error) {
     return res.status(502).json({ error: error.message });
   }

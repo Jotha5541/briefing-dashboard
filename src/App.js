@@ -1,6 +1,7 @@
 import './App.css'; // Used for styling login page 
 
 import WeatherWidget from './components/WeatherWidget';
+import NewsWidget from './components/NewsWidget';
 
 import supabase from './supabaseClient';
 
@@ -9,9 +10,9 @@ import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
-function WeatherComponent() {
+function DashboardComponent() {
   return (
-    <div className="WeatherComponent">
+    <div className="DashboardComponent">
       <h2>Weather Information</h2>
       <WeatherWidget />
 
@@ -21,10 +22,14 @@ function WeatherComponent() {
       >
       Logout
       </button>
-      
+
+      <h2 style={{ marginTop: '40px' }}>News Information</h2>
+      <NewsWidget />
     </div>
   );
 }
+
+
 
 function App() {
   const [ session, setSession ] = useState(null);
@@ -79,13 +84,11 @@ function App() {
       { /* Route 2: Dashboard Page ('/dashboard') */}
       <Route path="/dashboard" element={
         session ? (   // No session -> show nothing : Session -> Dashboard
-          <WeatherComponent session={session}/>
+          <DashboardComponent session={session}/>
         ) : null
       } />
-    </Routes>
-
     
-
+    </Routes>
   );
 }
 
