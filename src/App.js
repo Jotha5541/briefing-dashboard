@@ -1,6 +1,7 @@
 import './App.css'; // Used for styling login page 
 
 import WeatherWidget from './components/WeatherWidget';
+
 import supabase from './supabaseClient';
 
 import { useState, useEffect } from 'react';
@@ -83,9 +84,19 @@ function App() {
       } />
     </Routes>
 
+    
 
   );
 }
 
+/*
+    <div className="App">
+      <header className="App-header">
+        <h1>Daily Briefing Dashboard</h1>
+        <WeatherWidget />
+      </header>
+    </div>
+  );
+*/
 
 export default App;
