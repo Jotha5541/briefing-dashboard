@@ -2,6 +2,7 @@ import './App.css'; // Used for styling login page
 
 import WeatherWidget from './components/WeatherWidget';
 import NewsWidget from './components/NewsWidget';
+import SettingsPage from './components/SettingsPage';
 
 import supabase from './supabaseClient';
 
@@ -21,6 +22,13 @@ function DashboardComponent() {
       style={{ marginTop: '20px', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}
       >
       Logout
+      </button>
+
+      {/* Testing Purpose Only: Settings Button */}
+      <button onClick={() => window.location.href = '/settings'}
+      style={{ marginTop: '20px', marginLeft: '10px', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}
+      >
+      Settings
       </button>
 
       <h2 style={{ marginTop: '40px' }}>News Information</h2>
@@ -87,19 +95,12 @@ function App() {
           <DashboardComponent session={session}/>
         ) : null
       } />
+
+      {/* Route 3: User Settings Customization ('/settings') */}
+      <Route path="/settings" element={<SettingsPage />} />
     
     </Routes>
   );
 }
-
-/*
-    <div className="App">
-      <header className="App-header">
-        <h1>Daily Briefing Dashboard</h1>
-        <WeatherWidget />
-      </header>
-    </div>
-  );
-*/
 
 export default App;
