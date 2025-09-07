@@ -8,6 +8,7 @@ import supabase from './supabaseClient';
 
 import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
@@ -30,6 +31,8 @@ function DashboardComponent() {
       >
       Settings
       </button>
+
+      <nav> <Link to="/settings"> Settings </Link></nav>
 
       <h2 style={{ marginTop: '40px' }}>News Information</h2>
       <NewsWidget />

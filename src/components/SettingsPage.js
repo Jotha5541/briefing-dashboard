@@ -1,6 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { supabase } from '../supabaseClient';
+// import { supabase } from '../supabaseClient';
+
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+
+if (!supabaseUrl || !supabaseKey) {
+  throw new Error('Missing Supabase credentials');
+}
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 /* TESTING WEATHER SETTINGS ONLY */
@@ -24,6 +35,18 @@ function SettingsPage() {
         fetchSettings();
     }, []);
 
+    // Handle input changes
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setSettings((prev) => ({
+            ...prev,
+            weather: {
+                ...prev.weather,
+                [name]: value
+            }
+        }));
+    }
+    // Save settings to Supabase
     const handleSave = async () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (session) {
