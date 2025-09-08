@@ -7,7 +7,7 @@ import SettingsPage from './components/SettingsPage';
 import supabase from './supabaseClient';
 
 import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
@@ -25,11 +25,7 @@ function DashboardComponent() {
       </button>
 
       {/* Testing Purpose Only: Settings Button */}
-      <button onClick={() => window.location.href = '/settings'}
-      style={{ marginTop: '20px', marginLeft: '10px', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}
-      >
-      Settings
-      </button>
+      <Link to="/settings"> Settings </Link>
 
       <h2 style={{ marginTop: '40px' }}>News Information</h2>
       <NewsWidget />
