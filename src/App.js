@@ -25,8 +25,6 @@ function DashboardComponent() {
       </button>
 
       {/* Testing Purpose Only: Settings Button */}
-      <Link to="/settings"> Settings </Link>
-
       <nav> <Link to="/settings"> Settings </Link></nav>
 
       <h2 style={{ marginTop: '40px' }}>News Information</h2>
@@ -45,31 +43,31 @@ function App() {
   useEffect(() => {
     /* Check for existing session when app first loads */
     setLoading(true);   // Start loading check
+    
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      setLoading(false);
 
-      if (session) {  // Directs to dashboard if session exists
+      if (session && window.location.pathname === '/') {  // Directs to dashboard if logged in
         navigate('/dashboard');
       }
-    }).finally(() => {
-      setLoading(false);    // End loading check
     });
 
     /* Listen for login/logout events */
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
 
-      if (session) {  // Directs to dashboard on login
-        navigate('/dashboard');
-      }
-      else {    // Directs to login on logout
+      if (!session) {  // Directs to dashboard on logout
         navigate('/');
+      }
+      else if (window.location.pathname === '/'){    // Auto redirect to dashboard on login
+        navigate('/dashboard');
       }
     });
 
-    return () =>
+    return () => 
       subscription.unsubscribe();
-    }, [navigate]);
+  }, [navigate]);
 
     
     if (loading) {
@@ -95,7 +93,7 @@ function App() {
       } />
 
       {/* Route 3: User Settings Customization ('/settings') */}
-      <Route path="/settings" element={<SettingsPage />} />
+      <Route path="/settings" element={session ? <SettingsPage /> : <navigate to='/' />} />
     
     </Routes>
   );

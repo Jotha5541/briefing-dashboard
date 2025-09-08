@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-// import { supabase } from '../supabaseClient';
+// import { supabase } from './supabaseClient';
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -23,7 +23,7 @@ function SettingsPage() {
         const fetchSettings = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
-                const response = await axios.get('api/userSettings', {
+                const response = await axios.get('/api/userSettings', {
                     headers: { Authorization: `Bearer ${session.access_token}` }
                 });
                 setSettings(response.data);
@@ -46,16 +46,16 @@ function SettingsPage() {
             }
         }));
     }
-    // Save settings to Supabase
-    const handleSave = async () => {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-            await axios.put('api/userSettings', settings, {
-                headers: { Authorization: `Bearer ${session.access_token}` }
-            });
-            alert('Settings saved!');
-        }
-    };
+    // // Save settings to Supabase
+    // const handleSave = async () => {
+    //     const { data: { session } } = await supabase.auth.getSession();
+    //     if (session) {
+    //         await axios.put('api/userSettings', settings, {
+    //             headers: { Authorization: `Bearer ${session.access_token}` }
+    //         });
+    //         alert('Settings saved!');
+    //     }
+    // };
 
     if (loading) {
         return <div>Loading Settings...</div>;
