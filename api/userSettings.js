@@ -10,10 +10,16 @@ if (!supabaseUrl || !supabaseKey) {
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 export default async function handler(request, res) {
-    const { data: {userID} } = await supabase.auth.getUser(request.handlers.authorization);
+    const token = request.headers.authorization?.replace("Bearer ", "");
+    
+    if (!token) {
+        return res.status(401).json({ error: "No auth token found!" });
+    }
 
-    if (!userID) {
-        return res.status(401).json({ error: "Unauthorized" });
+    const { data: { user }, error: userError } = await supabase.auth.getUser(token);
+    
+    if (userError || !user) {
+        return res.status(401).json({ error: "Unauthorized!" });
     }
 
     if (request.method == 'GET') {
@@ -29,15 +35,15 @@ export default async function handler(request, res) {
                 throw error;
             }
 
-            response.status(200).json(data.settings || {});
+            res.status(200).json(data.settings || {});
 
         }
         catch (error) {
-            response.status(500).json({ error: error.message });
+            res.status(500).json({ error: error.message });
         }
     }
     else {
-        response.setHeader('Allow', ['GET', 'PUT']);
-        response.status(405).end(`Method ${request.method} Not Allowed`);
+        res.setHeader('Allow', ['GET', 'PUT']);
+        res.status(405).end(`Method ${request.method} Not Allowed`);
     }
 }

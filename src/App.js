@@ -27,6 +27,8 @@ function DashboardComponent() {
       {/* Testing Purpose Only: Settings Button */}
       <Link to="/settings"> Settings </Link>
 
+      <nav> <Link to="/settings"> Settings </Link></nav>
+
       <h2 style={{ marginTop: '40px' }}>News Information</h2>
       <NewsWidget />
     </div>
