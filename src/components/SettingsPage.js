@@ -50,7 +50,7 @@ function SettingsPage() {
     // const handleSave = async () => {
     //     const { data: { session } } = await supabase.auth.getSession();
     //     if (session) {
-    //         await axios.put('api/userSettings', settings, {
+    //         await axios.put('/api/userSettings', settings, {
     //             headers: { Authorization: `Bearer ${session.access_token}` }
     //         });
     //         alert('Settings saved!');
