@@ -3,6 +3,9 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;  // Use service role key for server-side operations
 
+// console.log("Supabase URL:", supabaseUrl);
+// console.log("Supabase Key:", supabaseKey ? 'Exists' : 'Missing');
+
 if (!supabaseUrl || !supabaseKey) {
     throw new Error('Missing Supabase credentials');
 }
@@ -25,45 +28,39 @@ export default async function handler(request, res) {
     try {
         if (request.method === 'GET') {
             /* Fetching user settings from Supabase */
-            try {
-                const { data, error } = await supabase
-                    .from('user_settings')
-                    .select('settings')
-                    .eq('user_id', user.id)
-                    .single();
+            const { data, error } = await supabase
+                .from('user_settings')
+                .select('settings')
+                .eq('user_id', user.id)
+                .single();
 
-                if (error) {
-                    throw error;
-                }
+            if (error && error.code !== 'PGRST116') throw error; // Ignore "no rows found" error
 
-                res.status(200).json(data.settings || {});
-            } catch (error) {
-                res.status(500).json({ error: error.message });
-            }
+            return res.status(200).json(data?.settings || {});
         }
 
         if (request.method === 'PUT') {
             /* Updating user settings in Supabase */
-            try {
-                const { data, error } = await supabase
-                    .from('user_settings')
-                    .upsert({ user_id: user.id, settings: request.body })
-                    .select();
+            const { data, error } = await supabase
+                .from('user_settings')
+                .upsert({
+                    user_id: user.id,
+                    settings: request.body,
+                    updated_at: new Date().toISOString(),
+                })
+                .select()
+                .single();
 
-                if (error) {
-                    throw error;
-                }
+            if (error) throw error; 
 
-                res.status(200).json(data);
-            } catch (error) {
-                res.status(500).json({ error: error.message });
-            }
+            return res.status(200).json(data);
         }
 
         res.setHeader('Allow', ['GET', 'PUT']);
         return res.status(405).end(`Method ${request.method} Not Allowed`);
     }
-    catch (error) {
-        res.status(500).json({ error: error.message });
+    catch (err) {
+        console.error('userSettings API error:', err);
+        return res.status(500).json({ error: err.message });
     }
 }
