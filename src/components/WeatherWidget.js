@@ -8,9 +8,10 @@ function WeatherWidget() {
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                const apiUrl = `/api/get-weather?city=Corona`;  // Change to dynamic later
-                const response = await axios.get(apiUrl);
-                setWeatherData(response.data);
+                const settingsResponse = await axios.get('/api/userSettings');
+                const city = settingsResponse.data.weather?.city || 'Los Angeles'; // Default to 'Los Angeles' if not set
+                const weatherResponse = await axios.get(`/api/get-weather?city=${encodeURIComponent(city)}`);
+                setWeatherData(weatherResponse.data);
             }
             catch (error) {
                 console.error("Error while fetching weather data:", error);

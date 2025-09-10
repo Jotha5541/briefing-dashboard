@@ -4,7 +4,6 @@ export default async function handler(request, res) {
     const { country = 'us', category = 'technology' } = request.query; // Default to US tech news
     const apiKey = process.env.NEWS_API_KEY;    // Retrieve News API key from environment
 
-
     if (!apiKey) {  // Could not find API key
         return res.status(500).json({ error: "Missing NEWS_API_KEY in environment." });
     }

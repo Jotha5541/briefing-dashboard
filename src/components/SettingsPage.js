@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-// import { supabase } from './supabaseClient';
 
 import { createClient } from '@supabase/supabase-js';
 
@@ -16,17 +15,30 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 /* TESTING WEATHER SETTINGS ONLY */
 function SettingsPage() {
-    const [settings, setSettings] = useState({ weather: { city: '' } });
+    const [settings, setSettings] = useState({ weather: { city: '' }, username: '' });
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchSettings = async () => {
             const { data: { session } } = await supabase.auth.getSession();
+
             if (session) {
-                const response = await axios.get('/api/userSettings', {
-                    headers: { Authorization: `Bearer ${session.access_token}` }
-                });
-                setSettings(response.data);
+                try {
+                    const response = await axios.get('/api/userSettings', {
+                        headers: { Authorization: `Bearer ${session.access_token}` },
+                    });
+
+                    setSettings((prev) => ({
+                        ...prev,
+                        ...response.data,
+                        weather: {
+                            ...prev.weather,
+                            ...(response.data.weather || {}),
+                        },
+                    }));
+                } catch (error) {
+                    console.error('Failed to fetch settings:', error);
+                }
             }
 
             setLoading(false);
@@ -43,42 +55,64 @@ function SettingsPage() {
             weather: {
                 ...prev.weather,
                 [name]: value
-            }
+            },
         }));
-    }
-    // // Save settings to Supabase
-    // const handleSave = async () => {
-    //     const { data: { session } } = await supabase.auth.getSession();
-    //     if (session) {
-    //         await axios.put('/api/userSettings', settings, {
-    //             headers: { Authorization: `Bearer ${session.access_token}` }
-    //         });
-    //         alert('Settings saved!');
-    //     }
-    // };
+    };
+
+    const handleSave = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (session) {
+            try {
+                await axios.put('/api/userSettings', settings, {
+                    headers: { Authorization: `Bearer $(session.access_token)`},
+                });
+                alert('Settings saved successfully!');
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                alert('Failed to save settings');
+            }
+        }
+    };
 
     if (loading) {
         return <div>Loading Settings...</div>;
     }
 
     return (
-        <div>
+        <div style={{ maxWidth: '500px', margin: '2rem auto' }}>
             <h1>User Settings</h1>
-            <section>
+
+            <section style={{ marginBottom: '20px'}}>
                 <h2> Weather </h2>
                 <label>
-                    City:
+                    City:{' '}
                     <input
                         type="text"
+                        name="city"
                         value={settings.weather?.city || ''}
                         onChange={handleInputChange}
                     />
                 </label>
             </section>
 
-            {/* Add more settings sections here */}
+            <section style={{ marginBottom: '20px' }}>
+                <h2> Profile </h2>
+                <label>
+                    Username:{' '}
+                    <input
+                        type="text"
+                        value={settings.username || ''}
+                        onChange={(e) => setSettings((prev) => ({ ...prev, username: e.target.value }))}
+                    />
+                </label>
+            </section>
+
+            <button onClick={handleSave} style={{ padding: '8px 16px', borderRadius: '6px' }}>
+                Save Settings
+            </button>
         </div>
     );
 }
 
-export default SettingsPage;
+export default SettingsPage; 
