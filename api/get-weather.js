@@ -1,14 +1,14 @@
 import fetch from "node-fetch";
 
 export default async function handler(request, res) {
-  const { city = "Corona" } = request.query; // Hard-coding city for now
+  const city = request.query.city; 
   const apiKey = process.env.WEATHER_API_KEY;
 
   if (!apiKey) {
     return res.status(500).json({ error: "Missing WEATHER_API_KEY in environment" });
   }
 
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${(city)}&appid=${apiKey}&units=imperial`;
+  const url = `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=imperial`;
 
   try {
     const response = await fetch(url);

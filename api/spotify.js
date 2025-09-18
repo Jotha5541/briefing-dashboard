@@ -14,10 +14,10 @@ export default async function handler(request, res) {
                         ':' + process.env.SPOTIFY_CLIENT_SECRET).toString('base64'),
                 },
                 body: new URLSearchParams({
-                    grant_type: 'client_credentials',
+                    grant_type: 'authorization_code',
                     code: request.body.code,
-                    redirect_url: process.env.SPOTIFY_REDIRECT_URI,
-                }),
+                    redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
+                }), 
             });
             
             const data = await response.json();

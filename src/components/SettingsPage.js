@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 import { createClient } from '@supabase/supabase-js';
+import { useNavigate } from 'react-router-dom';
 
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
@@ -18,6 +19,8 @@ function SettingsPage() {
     const [settings, setSettings] = useState({ weather: { city: '' }, username: '' });
     const [loading, setLoading] = useState(true);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         const fetchSettings = async () => {
             const { data: { session } } = await supabase.auth.getSession();
@@ -28,12 +31,14 @@ function SettingsPage() {
                         headers: { Authorization: `Bearer ${session.access_token}` },
                     });
 
+                    const saved = response.data.settings || response.data;
+
                     setSettings((prev) => ({
                         ...prev,
                         ...response.data,
                         weather: {
                             ...prev.weather,
-                            ...(response.data.weather || {}),
+                            ...(saved.weather || {}),
                         },
                     }));
                 } catch (error) {
@@ -65,9 +70,10 @@ function SettingsPage() {
         if (session) {
             try {
                 await axios.put('/api/userSettings', settings, {
-                    headers: { Authorization: `Bearer $(session.access_token)`},
+                    headers: { Authorization: `Bearer ${session.access_token}`},
                 });
                 alert('Settings saved successfully!');
+                navigate('/dashboard');
             } catch (error) {
                 console.error('Error saving settings:', error);
                 alert('Failed to save settings');
