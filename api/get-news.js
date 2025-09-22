@@ -10,7 +10,7 @@ export default async function handler(request, res) {
 
     /* Defining News API URL */
     const url = `https://newsapi.org/v2/top-headlines?country=${country}&category=${category}&apiKey=${apiKey}`;
-
+    // console.log("Fetching news from URL:", url);
     try {
         const response = await fetch(url);  // Request to News API
 

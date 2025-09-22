@@ -28,24 +28,58 @@ function NewsWidget() {
 
   return (
     <div style={{ marginTop: "10px" }}>
-      {newsData.slice(0, 5).map((newsData, idx) => (
+      {newsData.slice(0, 5).map((newsItem, idx) => (
         <div
           key={idx}
           style={{
+            display: "flex",
+            alignItems: "flex-start",
             marginBottom: "12px",
             padding: "10px",
             border: "1px solid #ddd",
             borderRadius: "6px",
+            gap: "10px",
           }}
         >
-          <h3 style={{ margin: "0 0 5px" }}>{newsData.title}</h3>
-          <p style={{ margin: 0, fontSize: "14px", color: "#555" }}>
-            {newsData.description}
-          </p>
-          <a href={newsData.url} target="_blank" rel="noopener noreferrer">
-            Read more →
+
+        {/* Image Thumbnail */}
+        {newsItem.urlToImage && (
+          <a 
+            href={newsItem.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ flexShrink: 0 }}
+          >
+            <img
+              src={newsItem.urlToImage}
+              alt={newsItem.title}
+              style={{
+                width: "100%",
+                height: "70px",
+                borderRadius: "6px",
+                objectFit: "cover",
+              }}
+            />
           </a>
+        )}
+
+        {/* Text Description */}
+        <div style={{ flex: 1 }}>
+          <h3 style={{ margin: "0 0 5px" }}>
+            <a
+              href={newsItem.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: "none", color: "#333" }}
+            >
+               {newsItem.title}
+            </a>
+          </h3>
+          <p style={{ margin: 0, fontSize: "14px", color: "#555" }}>
+            {newsItem.description}
+          </p>
         </div>
+      </div>
       ))}
     </div>
   );
