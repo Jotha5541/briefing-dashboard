@@ -60,3 +60,4 @@ export default async function handler(request, res) {
         return res.status(502).json({ error: error.message });
     }
 }
+
