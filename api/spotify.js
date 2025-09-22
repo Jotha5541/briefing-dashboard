@@ -46,6 +46,7 @@ export default async function handler(request, res) {
             });
             
             const data = await response.json();
+            
             if (!response.ok) throw new Error(data.error_description || "Failed to refresh token");
 
             return res.status(200).json({
