@@ -36,7 +36,7 @@ export default async function handler(request, res) {
 
             if (error && error.code !== 'PGRST116') throw error; // Ignore "no rows found" error
 
-            return res.status(200).json(data?.settings || {});
+            return res.status(200).json({ settings: data?.settings || {} });
         }
 
         if (request.method === 'PUT') {
@@ -53,7 +53,7 @@ export default async function handler(request, res) {
 
             if (error) throw error; 
 
-            return res.status(200).json(data);
+            return res.status(200).json({ settings: data.settings });
         }
 
         res.setHeader('Allow', ['GET', 'PUT']);

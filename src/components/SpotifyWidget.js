@@ -5,5 +5,5 @@ function SpotifyWiddget() {
     const [spotifyData, setSpotifyData] = useState(null);
     const [loading, setLoading] = useState(true);
 
-
+    
 }
