@@ -28,47 +28,47 @@ function DashboardComponent() {
           background: '#111',
           color: '#fff',
         }}
-        >
-          <h1 style={{ fontSize: '20px' }}> Briefing Dashboard </h1>
+      >
+        <h1 style={{ fontSize: '20px' }}> Briefing Dashboard </h1>
 
-          <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <Link to='/settings' style={{ color: '#fff', textDecoration: 'none' }}>
-              Settings
-            </Link>
-            <button
-              onClick={() => supabase.auth.signOut()}
-              style={{
-                padding: '6px 12px',
-                borderRadius: '6px',
-                border: 'none',
-                background: '#e50914',
-                color: '#fff',
-                cursor: 'pointer',
-              }}
-              >
-                Logout
-              </button>
-          </nav>
-        </header>
+        <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <Link to='/settings' style={{ color: '#fff', textDecoration: 'none' }}>
+            Settings
+          </Link>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: 'none',
+              background: '#e50914',
+              color: '#fff',
+              cursor: 'pointer',
+            }}
+            >
+              Logout
+            </button>
+        </nav>
+      </header>
 
-        {/* Left: Weather + Right: Spotify */}
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop: '20px', marginLeft: '10px', marginRight: '10px' }}>
-          {/* Weather Section */}
-          <div style={{ flex: 1 }}>
-            <h2> Weather Forecast </h2>
-            <WeatherWidget />
-          </div>
-
-          {/* Spotify Section */}
-          <div style={{ flex: 1 }}>
-            <h2> Spotify </h2>
-            <SpotifyWidget />
-          </div>
+      {/* Left: Weather + Right: Spotify */}
+      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop: '20px', marginLeft: '10px', marginRight: '10px' }}>
+        {/* Weather Section */}
+        <div style={{ flex: 1 }}>
+          <h2> Weather Forecast </h2>
+          <WeatherWidget />
         </div>
 
-        {/* News Section */}
-        <h2 style={{ marginTop: '40px', marginLeft: '10px' }}> News Information </h2>
-        <NewsWidget />
+        {/* Spotify Section */}
+        <div style={{ flex: 1 }}>
+          <h2> Spotify </h2>
+          <SpotifyWidget />
+        </div>
+      </div>
+
+      {/* News Section */}
+      <h2 style={{ marginTop: '40px', marginLeft: '10px' }}> News Information </h2>
+      <NewsWidget />
 
     </div>
   );
