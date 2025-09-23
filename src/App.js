@@ -2,6 +2,7 @@ import './App.css'; // Used for styling login page
 
 import WeatherWidget from './components/WeatherWidget';
 import NewsWidget from './components/NewsWidget';
+import SpotifyWidget from './components/SpotifyWidget';
 import SettingsPage from './components/SettingsPage';
 
 import supabase from './supabaseClient';
@@ -11,28 +12,67 @@ import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
+/* Note: Add Background Music with a toggle option */
+/* Note: Add a Home Page for Login/Signup Info */
+/* Note: Add a built-in timer widget */
+
 function DashboardComponent() {
   return (
     <div className="DashboardComponent">
-      <h2>Weather Information</h2>
-      <WeatherWidget />
+      <header
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '12px 20px',
+          background: '#111',
+          color: '#fff',
+        }}
+        >
+          <h1 style={{ fontSize: '20px' }}> Briefing Dashboard </h1>
 
-      {/* Testing Purpose Only: Logout Button */}
-      <button onClick={() => supabase.auth.signOut()}
-      style={{ marginTop: '20px', padding: '8px 16px', borderRadius: '6px', cursor: 'pointer' }}
-      >
-      Logout
-      </button>
+          <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+            <Link to='/settings' style={{ color: '#fff', textDecoration: 'none' }}>
+              Settings
+            </Link>
+            <button
+              onClick={() => supabase.auth.signOut()}
+              style={{
+                padding: '6px 12px',
+                borderRadius: '6px',
+                border: 'none',
+                background: '#e50914',
+                color: '#fff',
+                cursor: 'pointer',
+              }}
+              >
+                Logout
+              </button>
+          </nav>
+        </header>
 
-      {/* Testing Purpose Only: Settings Button */}
-      <nav> <Link to="/settings"> Settings </Link></nav>
+        {/* Left: Weather + Right: Spotify */}
+        <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop: '20px', marginLeft: '10px', marginRight: '10px' }}>
+          {/* Weather Section */}
+          <div style={{ flex: 1 }}>
+            <h2> Weather Forecast </h2>
+            <WeatherWidget />
+          </div>
 
-      <h2 style={{ marginTop: '40px' }}>News Information</h2>
-      <NewsWidget />
+          {/* Spotify Section */}
+          <div style={{ flex: 1 }}>
+            <h2> Spotify </h2>
+            <SpotifyWidget />
+          </div>
+        </div>
+
+        {/* News Section */}
+        <h2 style={{ marginTop: '40px', marginLeft: '10px' }}> News Information </h2>
+        <NewsWidget />
+
     </div>
   );
 }
-
 
 
 function App() {
@@ -87,7 +127,7 @@ function App() {
 
       { /* Route 2: Dashboard Page ('/dashboard') */}
       <Route path="/dashboard" element={
-        session ? (   // No session -> show nothing : Session -> Dashboard
+        session ? (   // No Session -> show nothing : Session -> Dashboard
           <DashboardComponent session={session}/>
         ) : null
       } />

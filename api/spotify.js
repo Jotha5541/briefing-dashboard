@@ -5,7 +5,7 @@ export default async function handler(request, res) {
     const tokenUrl = 'https://accounts.spotify.com/api/token';
 
     try {
-        if (request.method === 'POST' && request.body.code) {
+        if (request.method === 'POST' && request.body.code) {   // Initial login handler
             const response = await fetch(tokenUrl, {
                 method: 'POST',
                 headers: {
@@ -31,7 +31,7 @@ export default async function handler(request, res) {
             });
         }
 
-        if (request.method === 'POST' && request.body.refresh_token) {
+        if (request.method === 'POST' && request.body.refresh_token) {  // Token refresh handler
             const response = await fetch(tokenUrl, {
                 method: "POST",
                 headers: {

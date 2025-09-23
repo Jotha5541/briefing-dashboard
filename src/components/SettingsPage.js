@@ -90,7 +90,7 @@ function SettingsPage() {
             <h1>User Settings</h1>
 
             <section style={{ marginBottom: '20px'}}>
-                <h2> Weather </h2>
+                <h2> City </h2>
                 <label>
                     City:{' '}
                     <input
@@ -102,8 +102,8 @@ function SettingsPage() {
                 </label>
             </section>
 
-            <section style={{ marginBottom: '20px' }}>
-                <h2> Profile </h2>
+            {/* <section style={{ marginBottom: '20px' }}>
+                <h2>  </h2>
                 <label>
                     Username:{' '}
                     <input
@@ -112,7 +112,7 @@ function SettingsPage() {
                         onChange={(e) => setSettings((prev) => ({ ...prev, username: e.target.value }))}
                     />
                 </label>
-            </section>
+            </section> */}
 
             <button onClick={handleSave} style={{ padding: '8px 16px', borderRadius: '6px' }}>
                 Save Settings
