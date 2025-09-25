@@ -23,7 +23,7 @@ function NewsWidget() {
     }, []);
 
     if (loading) {
-        return <div>Loading news...</div>;
+        return <div> Loading news... </div>;
     }
 
   return (
