@@ -4,6 +4,7 @@ import WeatherWidget from './components/WeatherWidget';
 import NewsWidget from './components/NewsWidget';
 import SpotifyWidget from './components/SpotifyWidget';
 import SettingsPage from './components/SettingsPage';
+import Clock from './components/Clock';
 
 import supabase from './supabaseClient';
 
@@ -12,11 +13,14 @@ import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
+import axios from 'axios';
+
 /* Note: Add Background Music with a toggle option */
 /* Note: Add a Home Page for Login/Signup Info */
 /* Note: Add a built-in timer widget */
 
-function DashboardComponent() {
+
+function DashboardComponent({ session, settings }) {
   return (
     <div className="DashboardComponent">
       <header
@@ -30,6 +34,7 @@ function DashboardComponent() {
         }}
       >
         <h1 style={{ fontSize: '20px' }}> Briefing Dashboard </h1>
+        <Clock timezone={settings.timezone || 'UTC'}/>
 
         <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           <Link to='/settings' style={{ color: '#fff', textDecoration: 'none' }}>
@@ -78,15 +83,33 @@ function DashboardComponent() {
 function App() {
   const [ session, setSession ] = useState(null);
   const [ loading, setLoading ] = useState(true);
+  const [settings, setSettings] = useState({ timezone: 'UTC' });
   const navigate = useNavigate();
 
   useEffect(() => {
     /* Check for existing session when app first loads */
     setLoading(true);   // Start loading check
     
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setLoading(false);
+
+      if (session) {
+        try {
+          const response = await axios.get('/api/userSettings', {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+          });
+
+          const saved = response.data.settings || response.data;
+          setSettings((prev) => ({
+            ...prev,
+            ...saved,
+            timezone: saved.timezone || 'UTC',
+          }));
+        } catch (error) {
+          console.error('Failed to fetch settings:', error);
+        }
+      }
 
       if (session && window.location.pathname === '/') {  // Directs to dashboard if logged in
         navigate('/dashboard');
@@ -128,7 +151,7 @@ function App() {
       { /* Route 2: Dashboard Page ('/dashboard') */}
       <Route path="/dashboard" element={
         session ? (   // No Session -> show nothing : Session -> Dashboard
-          <DashboardComponent session={session}/>
+          <DashboardComponent session={session} settings={settings} />
         ) : null
       } />
 

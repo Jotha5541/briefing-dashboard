@@ -25,6 +25,8 @@ export default async function handler(request, res) {
                     redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
                 }), 
             });
+
+            console.log("Spotify token response status:", response.status);
             
             const data = await response.json();
             
