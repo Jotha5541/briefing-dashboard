@@ -13,7 +13,6 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-
 /* TESTING WEATHER SETTINGS ONLY */
 function SettingsPage() {
     const [settings, setSettings] = useState({ weather: { city: '' }, username: '' });
