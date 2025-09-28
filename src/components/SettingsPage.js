@@ -39,6 +39,7 @@ function SettingsPage() {
                             ...prev.weather,
                             ...(saved.weather || {}),
                         },
+                        timezone: response.data.timezone || prev.timezone || "UTC",
                     }));
                 } catch (error) {
                     console.error('Failed to fetch settings:', error);
@@ -54,13 +55,22 @@ function SettingsPage() {
     // Handle input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setSettings((prev) => ({
-            ...prev,
-            weather: {
-                ...prev.weather,
-                [name]: value
-            },
-        }));
+
+        if (name === 'timezone') {
+            setSettings((prev) => ({
+                ...prev,
+                timezone: value,
+            }));
+        }
+        else {
+            setSettings((prev) => ({
+                ...prev,
+                weather: {
+                    ...prev.weather,
+                    [name]: value
+                },
+            }));
+        }
     };
 
     const handleSave = async () => {
@@ -101,17 +111,19 @@ function SettingsPage() {
                 </label>
             </section>
 
-            {/* <section style={{ marginBottom: '20px' }}>
-                <h2>  </h2>
-                <label>
-                    Username:{' '}
-                    <input
-                        type="text"
-                        value={settings.username || ''}
-                        onChange={(e) => setSettings((prev) => ({ ...prev, username: e.target.value }))}
-                    />
-                </label>
-            </section> */}
+            <label className="block mb-2 font-medium"> Timezone </label>
+            <select
+                name="timezone"
+                value={settings.timezone || 'UTC'}
+                onChange={handleInputChange}
+                className="border rounded p-2 w-full"
+            >
+                <option value="UTC">UTC</option>
+                <option value="America/Los_Angeles">America/Los_Angeles</option>
+                <option value="America/New_York">America/New_York</option>
+                <option value="Europe/London">Europe/London</option>
+                <option value="Asia/Tokyo">Asia/Tokyo</option>
+            </select>
 
             <button onClick={handleSave} style={{ padding: '8px 16px', borderRadius: '6px' }}>
                 Save Settings

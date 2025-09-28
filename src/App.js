@@ -4,6 +4,7 @@ import WeatherWidget from './components/WeatherWidget';
 import NewsWidget from './components/NewsWidget';
 import SpotifyWidget from './components/SpotifyWidget';
 import SettingsPage from './components/SettingsPage';
+import Clock from './components/Clock';
 
 import supabase from './supabaseClient';
 
@@ -12,11 +13,14 @@ import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
+import axios from 'axios';
+
 /* Note: Add Background Music with a toggle option */
 /* Note: Add a Home Page for Login/Signup Info */
 /* Note: Add a built-in timer widget */
 
-function DashboardComponent() {
+
+function DashboardComponent({ session, settings }) {
   return (
     <div className="DashboardComponent">
       <header
@@ -28,47 +32,48 @@ function DashboardComponent() {
           background: '#111',
           color: '#fff',
         }}
-        >
-          <h1 style={{ fontSize: '20px' }}> Briefing Dashboard </h1>
+      >
+        <h1 style={{ fontSize: '20px' }}> Briefing Dashboard </h1>
+        <Clock timezone={settings.timezone || 'UTC'}/>
 
-          <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-            <Link to='/settings' style={{ color: '#fff', textDecoration: 'none' }}>
-              Settings
-            </Link>
-            <button
-              onClick={() => supabase.auth.signOut()}
-              style={{
-                padding: '6px 12px',
-                borderRadius: '6px',
-                border: 'none',
-                background: '#e50914',
-                color: '#fff',
-                cursor: 'pointer',
-              }}
-              >
-                Logout
-              </button>
-          </nav>
-        </header>
+        <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+          <Link to='/settings' style={{ color: '#fff', textDecoration: 'none' }}>
+            Settings
+          </Link>
+          <button
+            onClick={() => supabase.auth.signOut()}
+            style={{
+              padding: '6px 12px',
+              borderRadius: '6px',
+              border: 'none',
+              background: '#e50914',
+              color: '#fff',
+              cursor: 'pointer',
+            }}
+            >
+              Logout
+            </button>
+        </nav>
+      </header>
 
-        {/* Left: Weather + Right: Spotify */}
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop: '20px', marginLeft: '10px', marginRight: '10px' }}>
-          {/* Weather Section */}
-          <div style={{ flex: 1 }}>
-            <h2> Weather Forecast </h2>
-            <WeatherWidget />
-          </div>
-
-          {/* Spotify Section */}
-          <div style={{ flex: 1 }}>
-            <h2> Spotify </h2>
-            <SpotifyWidget />
-          </div>
+      {/* Left: Weather + Right: Spotify */}
+      <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop: '20px', marginLeft: '10px', marginRight: '10px' }}>
+        {/* Weather Section */}
+        <div style={{ flex: 1 }}>
+          <h2> Weather Forecast </h2>
+          <WeatherWidget />
         </div>
 
-        {/* News Section */}
-        <h2 style={{ marginTop: '40px', marginLeft: '10px' }}> News Information </h2>
-        <NewsWidget />
+        {/* Spotify Section */}
+        <div style={{ flex: 1 }}>
+          <h2> Spotify </h2>
+          <SpotifyWidget />
+        </div>
+      </div>
+
+      {/* News Section */}
+      <h2 style={{ marginTop: '40px', marginLeft: '10px' }}> News Information </h2>
+      <NewsWidget />
 
     </div>
   );
@@ -78,15 +83,33 @@ function DashboardComponent() {
 function App() {
   const [ session, setSession ] = useState(null);
   const [ loading, setLoading ] = useState(true);
+  const [settings, setSettings] = useState({ timezone: 'UTC' });
   const navigate = useNavigate();
 
   useEffect(() => {
     /* Check for existing session when app first loads */
     setLoading(true);   // Start loading check
     
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
       setLoading(false);
+
+      if (session) {
+        try {
+          const response = await axios.get('/api/userSettings', {
+            headers: { Authorization: `Bearer ${session.access_token}` },
+          });
+
+          const saved = response.data.settings || response.data;
+          setSettings((prev) => ({
+            ...prev,
+            ...saved,
+            timezone: saved.timezone || 'UTC',
+          }));
+        } catch (error) {
+          console.error('Failed to fetch settings:', error);
+        }
+      }
 
       if (session && window.location.pathname === '/') {  // Directs to dashboard if logged in
         navigate('/dashboard');
@@ -128,7 +151,7 @@ function App() {
       { /* Route 2: Dashboard Page ('/dashboard') */}
       <Route path="/dashboard" element={
         session ? (   // No Session -> show nothing : Session -> Dashboard
-          <DashboardComponent session={session}/>
+          <DashboardComponent session={session} settings={settings} />
         ) : null
       } />
 
