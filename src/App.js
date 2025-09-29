@@ -20,7 +20,7 @@ import axios from 'axios';
 /* Note: Add a built-in timer widget */
 
 
-function DashboardComponent({ session, settings }) {
+function DashboardComponent({ session, settings, user }) {
   return (
     <div className="DashboardComponent">
       <header
@@ -34,7 +34,10 @@ function DashboardComponent({ session, settings }) {
         }}
       >
         <h1 style={{ fontSize: '20px' }}> Briefing Dashboard </h1>
-        <Clock timezone={settings.timezone || 'UTC'}/>
+        <Clock 
+          timezone={settings.timezone || 'UTC'}
+          timeFormat={settings.timeFormat || '12h'}
+        />
 
         <nav style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           <Link to='/settings' style={{ color: '#fff', textDecoration: 'none' }}>
@@ -67,12 +70,16 @@ function DashboardComponent({ session, settings }) {
         {/* Spotify Section */}
         <div style={{ flex: 1 }}>
           <h2> Spotify </h2>
-          <SpotifyWidget />
+          {user ? (
+            <SpotifyWidget userId={user?.id} />
+          ) : (
+            <div>Please log in to view Spotify data.</div>
+          )}
         </div>
       </div>
 
       {/* News Section */}
-      <h2 style={{ marginTop: '40px', marginLeft: '10px' }}> News Information </h2>
+     <h2 style={{ marginTop: '40px', marginLeft: '10px' }}> News Information </h2>
       <NewsWidget />
 
     </div>
@@ -83,7 +90,11 @@ function DashboardComponent({ session, settings }) {
 function App() {
   const [ session, setSession ] = useState(null);
   const [ loading, setLoading ] = useState(true);
-  const [settings, setSettings] = useState({ timezone: 'UTC' });
+  const [ settings, setSettings ] = useState({
+    timezone: 'UTC',
+    timeFormat: '12h',
+  });
+  const [ user, setUser ] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -92,6 +103,7 @@ function App() {
     
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       setSession(session);
+      setUser(session?.user || null);
       setLoading(false);
 
       if (session) {
@@ -104,7 +116,8 @@ function App() {
           setSettings((prev) => ({
             ...prev,
             ...saved,
-            timezone: saved.timezone || 'UTC',
+            timezone: saved.timezone || prev.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+            timeFormat: saved.timeFormat || prev.timeFormat || '12h',
           }));
         } catch (error) {
           console.error('Failed to fetch settings:', error);
@@ -119,6 +132,7 @@ function App() {
     /* Listen for login/logout events */
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
+      setUser(session?.user || null);
 
       if (!session) {  // Directs to dashboard on logout
         navigate('/');
@@ -151,7 +165,7 @@ function App() {
       { /* Route 2: Dashboard Page ('/dashboard') */}
       <Route path="/dashboard" element={
         session ? (   // No Session -> show nothing : Session -> Dashboard
-          <DashboardComponent session={session} settings={settings} />
+          <DashboardComponent session={session} settings={settings} user={user} />
         ) : null
       } />
 

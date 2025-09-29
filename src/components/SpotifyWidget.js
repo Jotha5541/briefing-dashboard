@@ -7,30 +7,32 @@ function SpotifyWidget({ userId }) {
     const [loading, setLoading] = useState(true);
 
     /* Fetches current Spotify track */
-    const fetchSpotify = async () => {
-        try {
-            const tokenResponse = await axios.get(`/api/spotify?user_id=${userId}`);
-            const { access_token } = tokenResponse.data;
-
-            const response = await axios.get("https://api.spotify.com/v1/me/player/currently-playing", {
-                headers: { Authorization: `Bearer ${access_token}` },
-            });
-
-            setSpotifyData(response.data);
-        } catch (error) {
-            console.error("Error while fetching Spotify data:", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-
     useEffect(() => {
+        if (!userId) return;
+        const fetchSpotify = async () => {
+            try {
+                
+                const tokenResponse = await axios.get(`/api/spotify?user_id=${userId}`);
+                const { access_token } = tokenResponse.data;
+
+                const response = await axios.get("https://api.spotify.com/v1/me/player/currently-playing", {
+                    headers: { Authorization: `Bearer ${access_token}` },
+                });
+
+                setSpotifyData(response.data);
+            } catch (error) {
+                console.error("Error while fetching Spotify data:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        
         fetchSpotify();
         const interval = setInterval(fetchSpotify, 30000); // Refresh every 30 seconds
         return () => clearInterval(interval);
-    }, []); // Empty array means this effect runs once
+    }, [userId]);
 
+    if (!userId) return <SpotifyConnectButton userId={userId} />;
     if (loading) return <div>Loading Spotify song...</div>;
     if (!spotifyData || !spotifyData.item) return <div>No song currently playing</div>;
 
@@ -58,6 +60,33 @@ function SpotifyWidget({ userId }) {
             )}
         </div>
     ); 
+}
+
+function SpotifyConnectButton({ userId }) {
+    const handleSpotify = () => {
+        if (!userId) {alert("Please login first!"); return;}
+
+        const authUrl = `https://accounts.spotify.com/authorize?` + 
+            new URLSearchParams({
+                client_id: process.env.REACT_APP_SPOTIFY_CLIENT_ID,
+                response_type: 'code',
+                redirect_uri: process.env.REACT_APP_SPOTIFY_REDIRECT_URI + "/api/spotify-callback",
+                scope: 'user-read-currently-playing user-read-playback-state',
+                state: userId,  // Pass user_id in state for later use
+                show_dialog: 'true',
+            });
+
+            window.location.href = authUrl;
+    };
+
+    return (
+        <button 
+            onClick={handleSpotify} 
+            className="spotify-connect-button px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+            Connect to Spotify
+        </button>
+    );
 }
 
 export default SpotifyWidget;

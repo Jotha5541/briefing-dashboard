@@ -13,7 +13,6 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-/* TESTING WEATHER SETTINGS ONLY */
 function SettingsPage() {
     const [settings, setSettings] = useState({ weather: { city: '' }, username: '' });
     const [loading, setLoading] = useState(true);
@@ -39,7 +38,11 @@ function SettingsPage() {
                             ...prev.weather,
                             ...(saved.weather || {}),
                         },
-                        timezone: response.data.timezone || prev.timezone || "UTC",
+                        timezone: 
+                            response.data.timezone || 
+                            prev.timezone || 
+                            Intl.DateTimeFormat().resolvedOptions().timeZone,
+                        timeFormat: response.data.timeFormat || prev.timeFormat || '12h',
                     }));
                 } catch (error) {
                     console.error('Failed to fetch settings:', error);
@@ -114,17 +117,30 @@ function SettingsPage() {
             <label className="block mb-2 font-medium"> Timezone </label>
             <select
                 name="timezone"
-                value={settings.timezone || 'UTC'}
+                value={settings.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'}
                 onChange={handleInputChange}
                 className="border rounded p-2 w-full"
             >
-                <option value="UTC">UTC</option>
                 <option value="America/Los_Angeles">America/Los_Angeles</option>
                 <option value="America/New_York">America/New_York</option>
-                <option value="Europe/London">Europe/London</option>
-                <option value="Asia/Tokyo">Asia/Tokyo</option>
             </select>
 
+            <label className="block mb-2 font-medium mt-4"> Time Format </label>
+            <select
+                name="timeFormat"
+                value={settings.timeFormat || '12h'}
+                onChange={(e) =>
+                    setSettings((prev) => ({
+                        ...prev,
+                        timeFormat: e.target.value,
+                    }))
+                }
+                className="border rounded p-2 w-full"
+            >
+                <option value="12h"> 12-hour Format </option>
+                <option value="24h"> 24-hour Format </option>
+            </select>
+                
             <button onClick={handleSave} style={{ padding: '8px 16px', borderRadius: '6px' }}>
                 Save Settings
             </button>

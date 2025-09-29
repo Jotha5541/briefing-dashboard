@@ -1,4 +1,4 @@
-import fetch from "node-fetch";
+// import fetch from "node-fetch";
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.SUPABASE_URL;
@@ -25,8 +25,6 @@ export default async function handler(request, res) {
                     redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
                 }), 
             });
-
-            console.log("Spotify token response status:", response.status);
             
             const data = await response.json();
             
@@ -57,7 +55,6 @@ export default async function handler(request, res) {
             const isExpired = new Date(tokenRow.expires_at) <= new Date();
             if (!isExpired) return res.status(200).json({ access_token: tokenRow.access_token });
 
-
             const response = await fetch(tokenUrl, {
                 method: 'POST',
                 headers: {
@@ -68,6 +65,8 @@ export default async function handler(request, res) {
                     body: new URLSearchParams({
                         grant_type: "refresh_token",
                         refresh_token: tokenRow.refresh_token,
+                        client_id: process.env.SPOTIFY_CLIENT_ID,
+                        client_secret: process.env.SPOTIFY_CLIENT_SECRET,
                     }),
             });
             
@@ -91,6 +90,7 @@ export default async function handler(request, res) {
         return res.status(405).json({ error: "Method not allowed" });
 
     } catch (error) {
-        return res.status(502).json({ error: error.message });
+        console.log("Spotify API route error:", error);
+        return res.status(502).json({ error: error.message || "Unknown error"});
     }
 }
