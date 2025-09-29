@@ -1,6 +1,38 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
+import supabase from '../supabaseClient';
 
+
+function SpotifyConnectButton() {
+    const handleSpotifyLogin = async () => {
+        const { data, error } = await supabase.auth.getUser();
+
+        if (error || !data.user) return alert("You must be logged in to connect Spotify.");
+
+        const user = data.user;
+
+        const authUrl = 'https://accounts.spotify.com/authorize?' + 
+            new URLSearchParams({
+                client_id: process.env.REACT_APP_SPOTIFY_CLIENT_ID,
+                response_type: 'code',
+                redirect_uri: process.env.REACT_APP_SPOTIFY_REDIRECT_URI,
+                scope: 'user-read-currently-playing user-read-playback-state',
+                state: user.id,  // Pass user_id in state for later use
+                show_dialog: 'true',
+            });
+
+            window.location.href = authUrl;
+    };
+
+    return (
+        <button 
+            onClick={handleSpotifyLogin} 
+            className="spotify-connect-button px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+        >
+            Connect to Spotify
+        </button>
+    );
+}
 
 function SpotifyWidget({ userId }) {
     const [spotifyData, setSpotifyData] = useState(null);
@@ -9,9 +41,9 @@ function SpotifyWidget({ userId }) {
     /* Fetches current Spotify track */
     useEffect(() => {
         if (!userId) return;
+
         const fetchSpotify = async () => {
             try {
-                
                 const tokenResponse = await axios.get(`/api/spotify?user_id=${userId}`);
                 const { access_token } = tokenResponse.data;
 
@@ -32,7 +64,7 @@ function SpotifyWidget({ userId }) {
         return () => clearInterval(interval);
     }, [userId]);
 
-    if (!userId) return <SpotifyConnectButton userId={userId} />;
+    if (userId) return <SpotifyConnectButton />;
     if (loading) return <div>Loading Spotify song...</div>;
     if (!spotifyData || !spotifyData.item) return <div>No song currently playing</div>;
 
@@ -62,31 +94,6 @@ function SpotifyWidget({ userId }) {
     ); 
 }
 
-function SpotifyConnectButton({ userId }) {
-    const handleSpotify = () => {
-        if (!userId) {alert("Please login first!"); return;}
 
-        const authUrl = `https://accounts.spotify.com/authorize?` + 
-            new URLSearchParams({
-                client_id: process.env.REACT_APP_SPOTIFY_CLIENT_ID,
-                response_type: 'code',
-                redirect_uri: process.env.REACT_APP_SPOTIFY_REDIRECT_URI + "/api/spotify-callback",
-                scope: 'user-read-currently-playing user-read-playback-state',
-                state: userId,  // Pass user_id in state for later use
-                show_dialog: 'true',
-            });
-
-            window.location.href = authUrl;
-    };
-
-    return (
-        <button 
-            onClick={handleSpotify} 
-            className="spotify-connect-button px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
-        >
-            Connect to Spotify
-        </button>
-    );
-}
 
 export default SpotifyWidget;

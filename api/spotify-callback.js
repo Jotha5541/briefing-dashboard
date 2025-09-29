@@ -1,21 +1,31 @@
 import handler from './spotify';
 
-export default async function callback(request, res) {
-  try {
-    const { code, state } = request.query;
-    const user_id = state; // state holds user_id from Supabase
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-    if (!code || !user_id) {
-      return res.status(400).json({ error: "Missing code or user_id" });
-    }
+export default async function SpotifyCallback() {
+    const navigate = useNavigate();
 
-    // Call handler with POST to store tokens
-    request.method = 'POST';
-    request.body = { code, user_id };
-    return handler(request, res);
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
 
-  } catch (error) {
-    console.error("Spotify callback error:", error);
-    return res.status(500).json({ error: error.message });
-  }
+        if (!code || !userId) {
+            alert("Missing code or user ID in Spotify callback.");
+            navigate('/dashboard');
+            return;
+        }
+
+        axios.post('/api/spotify-callback', { code, user_id: userId })
+            .then(() => navigate('/dashboard'))
+            .catch(error => {
+                console.error("Spotify token exchange failed:", error);
+                alert("Failed to connect Spotify");
+                navigate('/dashboard');
+            });
+    }, [navigate]);
+
+    return <div>Connecting to Spotify...</div>;
 }

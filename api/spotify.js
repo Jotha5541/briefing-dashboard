@@ -1,17 +1,21 @@
-// import fetch from "node-fetch";
+import fetch from "node-fetch";
 import { createClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+const tokenUrl = 'https://accounts.spotify.com/api/token';
+
 export default async function handler(request, res) {
-
-    const tokenUrl = 'https://accounts.spotify.com/api/token';
-
     try {
-        if (request.method === 'POST' && request.body.code && request.body.user_id) {   // Initial login handler
-            /* Code exchange for tokens */
+        /* Spotify OAuth Callback token exchange */
+        if (request.method === 'POST' && request.body.code && request.body.user_id) {
+            const { code, state: user_id } = request.query;
+
+            if (!user_id) return res.status(400).json({ error: "Missing user_id (state)" });
+
+            // Exchange code for tokens
             const response = await fetch(tokenUrl, {
                 method: 'POST',
                 headers: {
@@ -21,7 +25,7 @@ export default async function handler(request, res) {
                 },
                 body: new URLSearchParams({
                     grant_type: 'authorization_code',
-                    code: request.body.code,
+                    code,
                     redirect_uri: process.env.SPOTIFY_REDIRECT_URI,
                 }), 
             });
@@ -34,13 +38,13 @@ export default async function handler(request, res) {
             const expiresAt = new Date(Date.now() + data.expires_in * 1000).toISOString();
 
             await supabase.from('spotify_tokens').upsert({
-                user_id: request.body.user_id,
+                user_id,
                 access_token: data.access_token,
                 refresh_token: data.refresh_token,
                 expires_at: expiresAt,
             });
 
-            return res.status(200).json({ success: true});
+            return res.redirect('/dashboard'); // Redirect to dashboard after successful connection
         }
 
         if (request.method === 'GET' && request.query.user_id) {  // Token refresh handler
@@ -65,8 +69,6 @@ export default async function handler(request, res) {
                     body: new URLSearchParams({
                         grant_type: "refresh_token",
                         refresh_token: tokenRow.refresh_token,
-                        client_id: process.env.SPOTIFY_CLIENT_ID,
-                        client_secret: process.env.SPOTIFY_CLIENT_SECRET,
                     }),
             });
             
@@ -82,7 +84,7 @@ export default async function handler(request, res) {
                     access_token: data.access_token,
                     expires_at: expiresAt,
                 })
-                .eq("user_id", request.query.user_id);
+                .eq('user_id', request.query.user_id);
 
             return res.status(200).json({ access_token: data.access_token });
         }
