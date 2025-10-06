@@ -18,6 +18,7 @@ import axios from 'axios';
 /* Note: Add Background Music with a toggle option */
 /* Note: Add a Home Page for Login/Signup Info */
 /* Note: Add a built-in timer widget */
+/* Change User Settings as drop-down menu instead of separate page */
 
 
 function DashboardComponent({ session, settings, user }) {
