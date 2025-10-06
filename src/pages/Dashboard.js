@@ -1,8 +1,8 @@
-import WeatherWidget from './WeatherWidget';
-import NewsWidget from './NewsWidget';
-import SpotifyWidget from './SpotifyWidget';
+import WeatherWidget from '../components/WeatherWidget';
+import NewsWidget from '../components/NewsWidget';
+import SpotifyWidget from '../components/SpotifyWidget';
 import SettingsPage from './SettingsPage';
-import Clock from './Clock';
+import Clock from '../components/Clock';
 
 import supabase from './supabaseClient';
 

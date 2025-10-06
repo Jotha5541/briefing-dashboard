@@ -3,8 +3,10 @@ import './App.css'; // Used for styling login page
 import WeatherWidget from './components/WeatherWidget';
 import NewsWidget from './components/NewsWidget';
 import SpotifyWidget from './components/SpotifyWidget';
-import SettingsPage from './components/SettingsPage';
 import Clock from './components/Clock';
+
+import SettingsPage from './pages/SettingsPage';
+import SpotifyCallback from './pages/SpotifyCallback';
 
 import supabase from './supabaseClient';
 
@@ -172,6 +174,9 @@ function App() {
 
       {/* Route 3: User Settings Customization ('/settings') */}
       <Route path="/settings" element={session ? <SettingsPage /> : <navigate to='/' />} />
+
+      {/* Route 4: Spotify Callback */}
+      <Route path="/spotify-callback" element={<SpotifyCallback />} />
     
     </Routes>
   );
