@@ -1,10 +1,9 @@
 import WeatherWidget from '../components/WeatherWidget';
 import NewsWidget from '../components/NewsWidget';
 import SpotifyWidget from '../components/SpotifyWidget';
-import SettingsPage from './SettingsPage';
 import Clock from '../components/Clock';
 
-import supabase from './supabaseClient';
+import supabase from '../supabaseClient';
 
 import axios from 'axios';
 import { useState, useEffect } from 'react';
@@ -75,4 +74,5 @@ function DashboardComponent({ session, settings, user }) {
       </div>
     );
 }
-  
+
+export default DashboardComponent;
