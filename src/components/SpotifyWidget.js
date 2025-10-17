@@ -82,7 +82,7 @@ function SpotifyWidget({ userId }) {
         };
         
         fetchSpotify();
-        const interval = setInterval(fetchSpotify, 30000); // Refresh every 30 seconds
+        const interval = setInterval(fetchSpotify, 15000); // Refresh every 15 seconds
         return () => clearInterval(interval);
     }, [userId]);
 

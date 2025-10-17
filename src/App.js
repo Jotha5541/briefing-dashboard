@@ -7,7 +7,7 @@ import SpotifyCallback from './pages/SpotifyCallback';
 import supabase from './supabaseClient';
 
 import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, Link } from 'react-router-dom';
+import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
@@ -89,18 +89,18 @@ function App() {
           <div style={{ width: '320px', margin: '50px auto' }}>
             <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
           </div>
-        ) : null
+        ) : (<Navigate to='/dashboard' />)
       } />
 
       { /* Route 2: Dashboard Page ('/dashboard') */}
       <Route path="/dashboard" element={
         session ? (   // No Session -> show nothing : Session -> Dashboard
           <DashboardComponent session={session} settings={settings} user={user} />
-        ) : null
+        ) : (<Navigate to='/' />)
       } />
 
       {/* Route 3: User Settings Customization ('/settings') */}
-      <Route path="/settings" element={session ? <SettingsMenu/> : <navigate to='/' />} />
+      <Route path="/settings" element={session ? <SettingsMenu/> : <Navigate to='/' />} />
 
       {/* Route 4: Spotify Callback */}
       <Route path="/spotify-callback" element={<SpotifyCallback />} />
