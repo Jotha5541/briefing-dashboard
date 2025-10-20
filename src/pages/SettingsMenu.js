@@ -13,7 +13,7 @@ if (!supabaseUrl || !supabaseKey) {
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-function SettingsPage() {
+function SettingsMenu() {
     const [settings, setSettings] = useState({ weather: { city: '' }, username: '' });
     const [loading, setLoading] = useState(true);
 
@@ -148,4 +148,4 @@ function SettingsPage() {
     );
 }
 
-export default SettingsPage; 
+export default SettingsMenu; 

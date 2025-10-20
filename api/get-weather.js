@@ -27,7 +27,6 @@ export default async function handler(request, res) {
     const coordsData = await coordsRes.json();
     const { lat, lon } = coordsData.coord;
 
-
     /* Fetching forecast data using coordinates */
     const forecastUrl = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${apiKey}&units=imperial`;
     const forecastRes = await fetch(forecastUrl);

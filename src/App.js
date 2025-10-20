@@ -3,6 +3,7 @@ import './App.css'; // Used for styling login page
 import DashboardComponent from './pages/Dashboard';
 import SettingsMenu from './pages/SettingsMenu';
 import SpotifyCallback from './pages/SpotifyCallback';
+import HomePage from './pages/Home';
 
 import supabase from './supabaseClient';
 
@@ -84,12 +85,14 @@ function App() {
   return (
     <Routes>
       {/* Route 1: Login Page ('/') */}
+      {/* Add Home Page Navigation here */}
       <Route path="/" element={
         !session ? (  // No session -> Login Form : Session -> show nothing
           <div style={{ width: '320px', margin: '50px auto' }}>
             <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
           </div>
         ) : null
+        
       } />
 
       { /* Route 2: Dashboard Page ('/dashboard') */}
