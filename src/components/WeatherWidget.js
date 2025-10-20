@@ -62,9 +62,8 @@ function WeatherWidget() {
             hour12: true,   // 12-hour format (set false for 24-hour)
         });
 
-
     return (
-        <div className="weather-widget p-4 rounded-xl shadow-md bg-white text-gray-900">
+        <div className="weather-widget w-full md:w-1/3 p-4 rounded-xl shadow-md bg-white/90 backdrop-blur text-gray-900">
             {/* Current Weather Section */}
             <h2 className="text-xl font-bold mb-2">Weather in {city}</h2>
             <div className="flex items-center gap-2">
@@ -104,34 +103,37 @@ function WeatherWidget() {
                         </div>
 
                         {/* Hourly Forecast - Expandable */}
-                        {expandedDay === index && (
-                            <div className="mt-2 pl-4 border-1 border-gray-300">
-                                <h4 className="font-medium"> Hourly Forecast </h4>
-                                <ul className="grid grid-cols-2 gap-2">
-                                    {hourly
-                                    .filter(
-                                        (hour) => 
-                                            new Date(hour.dt * 1000).getDate() ===
-                                            new Date(day.dt * 1000).getDate()
-                                    )
-                                    .map((hour) => (
-                                        <li
-                                            key={hour.dt}
-                                            className="flex items-center justify-between text-sm"
-                                        >
-                                            {formatTime(hour.dt)}
-                                            <div className="flex items-center gap-1">
-                                                <img
-                                                    src={`https://openweathermap.org/img/wn/${hour.weather[0].icon}.png`}
-                                                    alt={hour.weather[0].description}
-                                                />
-                                                {Math.round(hour.temp)}°F
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        )}
+                        <div
+                            className={`transition-all duration-500 ease-in-out overflow-hidden
+                                ${expandedDay === index ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`
+                            }
+                        >
+                            <h4 className="font-medium"> Hourly Forecast </h4>
+                            <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                                {hourly
+                                .filter(
+                                    (hour) => 
+                                        new Date(hour.dt * 1000).getDate() ===
+                                        new Date(day.dt * 1000).getDate()
+                                )
+                                .map((hour) => (
+                                    <li
+                                        key={hour.dt}
+                                        className="flex items-center justify-between text-sm bg-gray-50 p-2 rounded-md hover:bg-gray-100"
+                                    >
+                                        {formatTime(hour.dt)}
+                                        <div className="flex items-center gap-1">
+                                            <img
+                                                src={`https://openweathermap.org/img/wn/${hour.weather[0].icon}.png`}
+                                                alt={hour.weather[0].description}
+                                                className="w-6 h-6"
+                                            />
+                                            {Math.round(hour.temp)}°F
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </li>
                 ))}
             </ul>

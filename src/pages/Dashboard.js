@@ -10,7 +10,7 @@ import { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, Link } from 'react-router-dom';
 
 function DashboardComponent({ session, settings, user }) {
-    return (
+  return (
       <div className="DashboardComponent">
         <header
           style={{
