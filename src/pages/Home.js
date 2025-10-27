@@ -1,13 +1,5 @@
-import React from 'react';
+import { useNavigate, Navigate, redirect, Link } from 'react-router-dom';
 
-import { createClient } from '@supabase/supabase-js';
-import { useNavigate, Navigate } from 'react-router-dom';
-
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
-if (!supabaseUrl || !supabaseKey) throw new Error('Missing Supabase credentials');
-
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 function HomePage() {
     const navigate = useNavigate();

@@ -47,7 +47,11 @@ export default async function handler(request, res) {
     }
 }
 
-/* ====== HELPER FUNCTIONS ====== */
+/*
+=========================
+    HELPER FUNCTIONS
+=========================
+*/
 
 /* Exchange Spotify code for token */
 async function CodeForToken(code) {
@@ -83,6 +87,7 @@ async function storeTokens(user_id, data) {
     if (error) throw error;
 }
 
+/* Retrieve token for widget */
 async function getStoredTokens(user_id) {
     const { data: tokenRow, error } = await supabase
         .from('spotify_tokens')

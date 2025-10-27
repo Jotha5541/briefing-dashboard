@@ -14,7 +14,6 @@ import { ThemeSupa } from '@supabase/auth-ui-shared';
 
 import axios from 'axios';
 
-/* Note: Add a Home Page for Login/Signup Info */
 /* Note: Add a built-in timer widget */
 /* Change User Settings as drop-down menu instead of separate page */
 
@@ -29,52 +28,52 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    /* Check for existing session when app first loads */
-    setLoading(true);   // Start loading check
-    
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user || null);
-      setLoading(false);
+    const checkSession = async () => {
+      setLoading(true);   // Start loading check
+      
+      supabase.auth.getSession().then(async ({ data: { session } }) => {
+        setSession(session);
+        setUser(session?.user || null);
+        
+        /* Load pre-existing settings of user */
+        if (session) {
+          try {
+            const response = await axios.get('/api/userSettings', {
+              headers: { Authorization: `Bearer ${session.access_token}` },
+            });
 
-      if (session) {
-        try {
-          const response = await axios.get('/api/userSettings', {
-            headers: { Authorization: `Bearer ${session.access_token}` },
-          });
-
-          const saved = response.data.settings || response.data;
-          setSettings((prev) => ({
-            ...prev,
-            ...saved,
-            timezone: saved.timezone || prev.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
-            timeFormat: saved.timeFormat || prev.timeFormat || '12h',
-          }));
-        } catch (error) {
-          console.error('Failed to fetch settings:', error);
+            const saved = response.data.settings || response.data;
+            setSettings((prev) => ({
+              ...prev,
+              ...saved,
+              timezone: saved.timezone || prev.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+              timeFormat: saved.timeFormat || prev.timeFormat || '12h',
+            }));
+          } catch (error) {
+            console.error('Failed to fetch settings:', error);
+          }
         }
-      }
+        handleSave(settings);  // Save settings on load
+        if (session && (window.location.pathname === '/' || window.location.pathname === '/login')) {  // Directs to dashboard if logged in
+          navigate('/dashboard');
+        }
+        
+        setLoading(false);
+      });
+    };
 
-      if (session && window.location.pathname === '/') {  // Directs to dashboard if logged in
-        navigate('/dashboard');
-      }
-    });
+    checkSession();
 
     /* Listen for login/logout events */
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user || null);
 
-      if (!session) {  // Directs to Home on logout
-        navigate('/');
-      }
-      else if (window.location.pathname === '/'){    // Auto redirect to dashboard on login
-        navigate('/dashboard');
-      }
+      if (session) navigate('/dashboard');
+      else navigate('/');
     });
 
-    return () => 
-      subscription.unsubscribe();
+    return () => subscription.unsubscribe();
   }, [navigate]);
 
     
@@ -100,7 +99,7 @@ function App() {
       <Route path="/dashboard" element={
         session ? (   // No Session -> show nothing : Session -> Dashboard
           <DashboardComponent session={session} settings={settings} user={user} />
-        ) : (<Navigate to='/' />)
+        ) : (<Navigate to='/login' />)
       } />
 
       {/* Route 4: User Settings Customization ('/settings') */}
