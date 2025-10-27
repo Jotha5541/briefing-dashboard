@@ -8,7 +8,7 @@ import HomePage from './pages/Home';
 import supabase from './supabaseClient';
 
 import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, Navigate, Link } from 'react-router-dom';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 
@@ -65,7 +65,7 @@ function App() {
       setSession(session);
       setUser(session?.user || null);
 
-      if (!session) {  // Directs to dashboard on logout
+      if (!session) {  // Directs to Home on logout
         navigate('/');
       }
       else if (window.location.pathname === '/'){    // Auto redirect to dashboard on login
@@ -84,27 +84,29 @@ function App() {
 
   return (
     <Routes>
-      {/* Route 1: Login Page ('/') */}
-      {/* Add Home Page Navigation here */}
-      <Route path="/" element={
-        !session ? (  // No session -> Login Form : Session -> show nothing
+      {/* Route 1: Home Page ('/') */}
+      <Route path='/' element={<HomePage />} />
+
+      {/* Route 2: Login Page ('/login') */}
+      <Route path='/login' element={
+        !session ? (
           <div style={{ width: '320px', margin: '50px auto' }}>
             <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
           </div>
         ) : (<Navigate to='/dashboard' />)
       } />
 
-      { /* Route 2: Dashboard Page ('/dashboard') */}
+      { /* Route 3: Dashboard Page ('/dashboard') */}
       <Route path="/dashboard" element={
         session ? (   // No Session -> show nothing : Session -> Dashboard
           <DashboardComponent session={session} settings={settings} user={user} />
         ) : (<Navigate to='/' />)
       } />
 
-      {/* Route 3: User Settings Customization ('/settings') */}
+      {/* Route 4: User Settings Customization ('/settings') */}
       <Route path="/settings" element={session ? <SettingsMenu/> : <Navigate to='/' />} />
 
-      {/* Route 4: Spotify Callback */}
+      {/* Route 5: Spotify Callback */}
       <Route path="/spotify-callback" element={<SpotifyCallback />} />
     
     </Routes>

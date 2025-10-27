@@ -5,9 +5,7 @@ import Clock from '../components/Clock';
 
 import supabase from '../supabaseClient';
 
-import axios from 'axios';
-import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 function DashboardComponent({ session, settings, user }) {
   return (
