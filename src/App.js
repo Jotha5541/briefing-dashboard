@@ -5,10 +5,10 @@ import DashboardComponent from './pages/Dashboard';
 import SettingsMenu from './pages/SettingsMenu';
 import SpotifyCallback from './pages/SpotifyCallback';
 
-import { supabase } from './supabaseClient';
+import supabase from './supabaseClient';
 
 import React, { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import axios from 'axios';
@@ -24,61 +24,67 @@ function App() {
     timeFormat: '12h',
   });
   const [ user, setUser ] = useState(null);
+
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    const checkSession = async () => {
-      setLoading(true);   // Start loading check
+    setLoading(true);   // Start loading check
       
-      supabase.auth.getSession().then(async ({ data: { session } }) => {
-        setSession(session);
-        setUser(session?.user || null);
-        
-        /* Load pre-existing settings of user */
-        if (session) {
-          try {
-            const response = await axios.get('/api/userSettings', {
-              headers: { Authorization: `Bearer ${session.access_token}` },
-            });
+    /* Check for Session */
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user || null);
 
-            const saved = response.data.settings || response.data;
-            setSettings((prev) => ({
-              ...prev,
-              ...saved,
-              timezone: saved.timezone || prev.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
-              timeFormat: saved.timeFormat || prev.timeFormat || '12h',
-            }));
-          } catch (error) {
-            console.error('Failed to fetch settings:', error);
-          }
-        }
-        handleSave(settings);  // Save settings on load
-        if (session && (window.location.pathname === '/' || window.location.pathname === '/login')) {  // Directs to dashboard if logged in
-          navigate('/dashboard');
-        }
-        
-        setLoading(false);
-      });
-    };
-
-    checkSession();
+      // Redirects to Dashboard if user is on Home or Login
+      if (session && (location.pathname === '/' || location.pathname === '/login')) {
+        navigate('/dashboard');
+      }
+      
+      // Fetch for settings if currently logged in
+      if (session) fetchUserSettings(session)
+      
+      setLoading(false);
+    });
 
     /* Listen for login/logout events */
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user || null);
 
-      if (session) navigate('/dashboard');
-      else navigate('/');
+      if (session) {
+        if (window.location.pathname === '/' || window.location.pathname === '/login') {
+          navigate('/dashboard');
+        }
+      }
     });
-
+    
     return () => subscription.unsubscribe();
   }, [navigate]);
 
-    
-    if (loading) {
-      return <div>Loading . . . </div>;
+  /* Helper Function */
+  const fetchUserSettings = async(currentSession) => {
+    try {
+      const response = await axios.get('/api/userSettings', {
+        headers: { Authorization: `Bearer ${session.access_token}` },
+      });
+
+      const saved = response.data.settings || response.data;
+      setSettings((prev) => ({
+        ...prev,
+        ...saved,
+        timezone: saved.timezone || prev.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
+        timeFormat: saved.timeFormat || prev.timeFormat || '12h',
+      }));
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
     }
+  };
+
+
+  if (loading) {
+    return <div className="flex h-screen items-center justify-center text-white bg-gray-900">Loading...</div>;
+  }
 
   return (
     <Routes>
@@ -89,7 +95,7 @@ function App() {
       <Route path='/login' element={
         !session ? (
           <div style={{ width: '320px', margin: '50px auto' }}>
-            <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" />
+            <Auth supabaseClient={supabase} appearance={{ theme: ThemeSupa }} theme="dark" providers={['google', 'github', 'spotify']} />
           </div>
         ) : (<Navigate to='/dashboard' />)
       } />
@@ -102,8 +108,8 @@ function App() {
       } />
 
       {/* Route 4: User Settings Customization ('/settings') */}
-      <Route path="/settings" element={session ? <SettingsMenu/> : <Navigate to='/' />} />
-
+      <Route path="/settings" element={session ? (
+        <SettingsMenu session={session} settings={settings} setSettings={setSettings} /> ) : <Navigate to='/' />} />
       {/* Route 5: Spotify Callback */}
       <Route path="/spotify-callback" element={<SpotifyCallback />} />
     
