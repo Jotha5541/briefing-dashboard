@@ -1,17 +1,16 @@
 import './App.css'; // Used for styling login page 
 
+import HomePage from './pages/Home';
 import DashboardComponent from './pages/Dashboard';
 import SettingsMenu from './pages/SettingsMenu';
 import SpotifyCallback from './pages/SpotifyCallback';
-import HomePage from './pages/Home';
 
-import supabase from './supabaseClient';
+import { supabase } from './supabaseClient';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
-
 import axios from 'axios';
 
 /* Note: Add a Home Page for Login/Signup Info */
