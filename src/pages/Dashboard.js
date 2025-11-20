@@ -6,8 +6,9 @@ import Clock from '../components/Clock';
 import supabase from '../supabaseClient';
 
 import { Link } from 'react-router-dom';
+// import { DateTime } from 'luxon';
 
-function DashboardComponent({ session, settings, user }) {
+function DashboardComponent({ settings, user }) {
   return (
       <div className="DashboardComponent">
         <header
@@ -22,7 +23,6 @@ function DashboardComponent({ session, settings, user }) {
         >
           <h1 style={{ fontSize: '20px' }}> Briefing Dashboard </h1>
           <Clock 
-            timezone={settings.timezone || 'UTC'}
             timeFormat={settings.timeFormat || '12h'}
           />
   

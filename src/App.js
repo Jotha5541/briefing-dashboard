@@ -7,7 +7,7 @@ import SpotifyCallback from './pages/SpotifyCallback';
 
 import supabase from './supabaseClient';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
@@ -20,13 +20,30 @@ function App() {
   const [ session, setSession ] = useState(null);
   const [ loading, setLoading ] = useState(true);
   const [ settings, setSettings ] = useState({
-    timezone: 'UTC',
     timeFormat: '12h',
   });
   const [ user, setUser ] = useState(null);
 
   const navigate = useNavigate();
   const location = useLocation();
+
+  /* Helper Function */
+  const fetchUserSettings = useCallback(async(currentSession) => {
+    try {
+      const response = await axios.get('/api/userSettings', {
+        headers: { Authorization: `Bearer ${currentSession.access_token}` },
+      });
+
+      const saved = response.data.settings || response.data;
+      setSettings((prev) => ({
+        ...prev,
+        ...saved,
+        timeFormat: saved.timeFormat || prev.timeFormat || '12h',
+      }));
+    } catch (error) {
+      console.error('Failed to fetch settings:', error);
+    }
+  }, []);
 
   useEffect(() => {
     setLoading(true);   // Start loading check
@@ -60,26 +77,7 @@ function App() {
     });
     
     return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  /* Helper Function */
-  const fetchUserSettings = async(currentSession) => {
-    try {
-      const response = await axios.get('/api/userSettings', {
-        headers: { Authorization: `Bearer ${session.access_token}` },
-      });
-
-      const saved = response.data.settings || response.data;
-      setSettings((prev) => ({
-        ...prev,
-        ...saved,
-        timezone: saved.timezone || prev.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
-        timeFormat: saved.timeFormat || prev.timeFormat || '12h',
-      }));
-    } catch (error) {
-      console.error('Failed to fetch settings:', error);
-    }
-  };
+  }, [navigate, fetchUserSettings, location.pathname]);
 
 
   if (loading) {
@@ -103,8 +101,8 @@ function App() {
       { /* Route 3: Dashboard Page ('/dashboard') */}
       <Route path="/dashboard" element={
         session ? (   // No Session -> show nothing : Session -> Dashboard
-          <DashboardComponent session={session} settings={settings} user={user} />
-        ) : (<Navigate to='/login' />)
+          <DashboardComponent settings={settings} user={user} />
+        ) : (<Navigate to='/' />)
       } />
 
       {/* Route 4: User Settings Customization ('/settings') */}

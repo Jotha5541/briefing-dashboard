@@ -38,10 +38,6 @@ function SettingsMenu() {
                             ...prev.weather,
                             ...(saved.weather || {}),
                         },
-                        timezone: 
-                            response.data.timezone || 
-                            prev.timezone || 
-                            Intl.DateTimeFormat().resolvedOptions().timeZone,
                         timeFormat: response.data.timeFormat || prev.timeFormat || '12h',
                     }));
                 } catch (error) {
@@ -58,22 +54,13 @@ function SettingsMenu() {
     // Handle input changes
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-
-        if (name === 'timezone') {
-            setSettings((prev) => ({
-                ...prev,
-                timezone: value,
-            }));
-        }
-        else {
-            setSettings((prev) => ({
-                ...prev,
-                weather: {
-                    ...prev.weather,
-                    [name]: value
-                },
-            }));
-        }
+        setSettings((prev) => ({
+            ...prev,
+            weather: {
+                ...prev.weather,
+                [name]: value
+            }
+        }));
     };
 
     const handleSave = async () => {
@@ -113,17 +100,6 @@ function SettingsMenu() {
                     />
                 </label>
             </section>
-
-            <label className="block mb-2 font-medium"> Timezone </label>
-            <select
-                name="timezone"
-                value={settings.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC'}
-                onChange={handleInputChange}
-                className="border rounded p-2 w-full"
-            >
-                <option value="America/Los_Angeles">America/Los_Angeles</option>
-                <option value="America/New_York">America/New_York</option>
-            </select>
 
             <label className="block mb-2 font-medium mt-4"> Time Format </label>
             <select
