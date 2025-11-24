@@ -1,12 +1,11 @@
 import WeatherWidget from '../components/WeatherWidget';
 import NewsWidget from '../components/NewsWidget';
-import SpotifyWidget from '../components/SpotifyWidget';
+import SpotifyWidget from '../components/SpotifyWidget/SpotifyWidget';
 import Clock from '../components/Clock';
 
 import supabase from '../supabaseClient';
 
 import { Link } from 'react-router-dom';
-// import { DateTime } from 'luxon';
 
 function DashboardComponent({ settings, user }) {
   return (
@@ -45,9 +44,9 @@ function DashboardComponent({ settings, user }) {
               </button>
           </nav>
         </header>
-  
-        {/* Left: Weather + Right: Spotify */}
-        <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', marginTop: '20px', marginLeft: '10px', marginRight: '10px' }}>
+
+        {/* Left: Weather ==||||== Right: Spotify */}
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginTop: '20px', marginLeft: '10px', marginRight: '10px' }}>
           {/* Weather Section */}
           <div style={{ flex: 1 }}>
             <h2> Weather Forecast </h2>

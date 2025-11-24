@@ -69,6 +69,7 @@ function App() {
       setSession(session);
       setUser(session?.user || null);
 
+      // Navigate to Dashboard page after logging in
       if (session) {
         if (window.location.pathname === '/' || window.location.pathname === '/login') {
           navigate('/dashboard');

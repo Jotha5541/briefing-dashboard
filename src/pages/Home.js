@@ -14,12 +14,12 @@ function HomePage() {
             {/* Transparent Header */}
             <header className="fixed top-0 left-0 w-full flex justify-between items-center px-8 py-4 bg-black/30 backdrop-blur-md">
                 <h1 className="text-2xl font-semibold tracking-wide"> Briefing Dashboard </h1>
-                <button
+                {/* <button
                     onClick={handleLogin}
                     className="px-4 py-2 border border-white rounded-lg hover:bg-white hover:text-black transition-all"
                 >
                     Login
-                </button>
+                </button> */}
             </header>
 
             {/* Hero Section */}
