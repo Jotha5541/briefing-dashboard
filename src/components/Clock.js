@@ -18,7 +18,7 @@ function Clock({ timeFormat}) {
 
     return (
         <div className="font-mono text-lg">
-            {currentTime} ({localDate.zoneName}, {timeFormat || '12h'})
+            {currentTime} [{localDate.zoneName}, {timeFormat || '12h'}]
         </div>
     );
 }

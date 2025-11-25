@@ -19,9 +19,7 @@ import axios from 'axios';
 function App() {
   const [ session, setSession ] = useState(null);
   const [ loading, setLoading ] = useState(true);
-  const [ settings, setSettings ] = useState({
-    timeFormat: '12h',
-  });
+  const [ settings, setSettings ] = useState({ timeFormat: '12h' });
   const [ user, setUser ] = useState(null);
 
   const navigate = useNavigate();

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
 import supabase from '../../supabaseClient';
 import { SpotifyLogo, IconPrev, IconNext, IconPlay, IconPause } from './SVGIcons';
@@ -6,9 +6,10 @@ import { SpotifyLogo, IconPrev, IconNext, IconPlay, IconPause } from './SVGIcons
 // --- Helper: Format MS to MM:SS ---
 const formatTime = (ms) => {
     if (!ms) return "0:00";
-    const minutes = Math.floor(ms / 60000);
-    const seconds = ((ms % 60000) / 1000).toFixed(0);
-    return minutes + ":" + (seconds < 10 ? '0' : '') + seconds;
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
 };
 
 function SpotifyConnectButton() {
@@ -53,12 +54,16 @@ function SpotifyWidget({ userId }) {
     const [error, setError] = useState(false);  // Check for tokens
     const [authorized, setAuthorized] = useState(false);
 
+    /* Track Progress States */
     const [progress, setProgress] = useState(0);
     const [duration, setDuration] = useState(0);
     const [isPlaying, setIsPlaying] = useState(false);
 
+    const [smoothTransition, setSmoothTransition] = useState(true);
+    const lastTrackID = useRef(null);
+
     /* Fetches Spotify Token and Data */
-    const fetchSpotify = async () => {
+    const fetchSpotify = useCallback(async () => {
         if (!userId) { setLoading(false); return; }
 
         try {
@@ -83,6 +88,15 @@ function SpotifyWidget({ userId }) {
                 setSpotifyData(null); // No content, nothing playing
                 setIsPlaying(false);
             } else {
+                const currentTrackID = response.data.item.id;
+
+                if (lastTrackID.current !== currentTrackID) {
+                    setSmoothTransition(false);
+                    lastTrackID.current = currentTrackID;
+
+                    setTimeout(() => setSmoothTransition(true), 500);
+                }
+
                 setSpotifyData(response.data);
                 setProgress(response.data.progress_ms);
                 setDuration(response.data.item.duration_ms);
@@ -96,7 +110,7 @@ function SpotifyWidget({ userId }) {
         } finally {
             setLoading(false);
         }
-    };
+    }, [userId]);
 
     /* Poll Interval */
     useEffect(() => {
@@ -126,31 +140,31 @@ function SpotifyWidget({ userId }) {
         let url = '', method = 'POST';
 
         switch (command) {
-            case 'next': url = "https://api.spotify.com/v1/me/player/next"; break;
-            case 'previous': url = "https://api.spotify.com/v1/me/player/previous"; break;
+            case 'next': url = "https://api.spotify.com/v1/me/player/next"; setSmoothTransition(false); break;
+            case 'previous': url = "https://api.spotify.com/v1/me/player/previous"; setSmoothTransition(false); break;
             case 'play': url = "https://api.spotify.com/v1/me/player/play"; method = 'PUT'; break;
             case 'pause': url = "https://api.spotify.com/v1/me/player/pause"; method = 'PUT'; break;
             default: return;
         }
 
         try {
-            if (command == 'play') setIsPlaying(false);
-            if (command == 'pause') setIsPlaying(false);
+            if (command === 'play') setIsPlaying(false);
+            if (command === 'pause') setIsPlaying(false);
 
             await axios({ method, url, headers: { Authorization: `Bearer ${accessToken}`} });
 
-            setTimeout(fetchSpotify, 500);
+            setTimeout(() => {
+                fetchSpotify();
+                setTimeout(() => setSmoothTransition(true), 100);
+            }, 100);
         } catch (err) {
             console.error("Control error: ", err.response?.data || err.message);
 
             if (err.response) {
                 switch (err.response.status) {
-                    case 403:
-                        alert("Action forbidden. You likely need Spotify Premium."); break;
-                    case 404:
-                        alert("No Active Device found. Open Spotify on your device and play a song."); break;
-                    default:
-                        console.error("Unhandled Spotify Error: ", err.response.data);
+                    case 403: alert("Action forbidden. You likely need Spotify Premium."); break;
+                    case 404: alert("No Active Device found. Open Spotify on your device and play a song."); break;
+                    default: console.error("Unhandled Spotify Error: ", err.response.data);
                 }
             }
         }
@@ -161,7 +175,7 @@ function SpotifyWidget({ userId }) {
     if (!authorized || error) return <SpotifyConnectButton />;
     if (!spotifyData || !spotifyData.item) return (
         <div className="spotify-widget p-4 rounded-xl shadow-md bg-zinc-900 text-white w-full md:w-1/2 lg:w-1/3 min-w-[320px] border border-zinc-800">
-            <p className="text-sm text-gray-400 text-center"> Nothing playing right now. </p>
+            <p className="font-bold text-sm text-gray-400 text-center"> Nothing playing right now. </p>
         </div>
     );
 
@@ -169,8 +183,9 @@ function SpotifyWidget({ userId }) {
     const progressRatio = duration ? (progress / duration) * 100 : 0;
     
     return (
-        <div className="spotify-widget p-5 rounded-xl shadow-2xl bg-zinc-900 text-white w-full md:w-1/2 lg:w-1/3 min-w-[320px] border border-zinc-800 transition-all duration-300">
+        <div className="spotify-widget p-5 rounded-xl shadow-2xl bg-zinc-900 text-white w-full md:w-1/2 lg:w-1/2 min-w-[480px] border border-zinc-800 transition-all duration-300">
             {/* Header Component */}
+            <h2 className="text-xl font-bold mb-2"> Spotify </h2>
             <div className="flex items-center justify-between mb-4 opacity-80">
                 <SpotifyLogo />
                 <h2 className="text-xs font-bold mb-2">Now Playing on Spotify</h2>
@@ -188,12 +203,12 @@ function SpotifyWidget({ userId }) {
                     <div className='w-full max-w-[250px] mt-4'>
                         <div className='w-full bg-gray-700 h-1.5 rounded-full overflow-hidden'>
                             <div 
-                                className="bg-green-500 h-full transition-all duration-1000 ease-linear"
+                                className={`bg-green-500 h-full ${smoothTransition ? 'transition-all duration-1000 ease-linear' : ''}`}
                                 style={{ width: `${progressRatio}%` }}
                             ></div>
                         </div>
                         {/* Timestamp Labels */}
-                        <div className="flex justify-between text-[10px] text-gray-400 mt-1 font-mono">
+                        <div className="flex justify-between w-full text-[10px] text-gray-400 mt-1 font-mono">
                             <span>{formatTime(progress)}</span>
                             <span>{formatTime(duration)}</span>
                         </div>

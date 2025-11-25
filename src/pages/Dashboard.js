@@ -1,6 +1,6 @@
 import WeatherWidget from '../components/WeatherWidget';
 import NewsWidget from '../components/NewsWidget';
-import SpotifyWidget from '../components/SpotifyWidget/SpotifyWidget';
+import SpotifyWidget from '../components/Spotify/SpotifyWidget';
 import Clock from '../components/Clock';
 
 import supabase from '../supabaseClient';
@@ -49,13 +49,11 @@ function DashboardComponent({ settings, user }) {
         <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', marginTop: '20px', marginLeft: '10px', marginRight: '10px' }}>
           {/* Weather Section */}
           <div style={{ flex: 1 }}>
-            <h2> Weather Forecast </h2>
             <WeatherWidget />
           </div>
   
           {/* Spotify Section */}
-          <div style={{ flex: 1 }}>
-            <h2> Spotify </h2>
+          <div style={{ flex: 2 }}>
             {user ? (
               <SpotifyWidget userId={user?.id} />
             ) : (

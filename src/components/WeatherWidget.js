@@ -63,7 +63,7 @@ function WeatherWidget() {
         });
 
     return (
-        <div className="weather-widget w-full md:w-1/3 p-4 rounded-xl shadow-md bg-white/90 backdrop-blur text-gray-900">
+        <div className="weather-widget w-full md:w-1/2 lg:w-1/2 min-w-[480px] p-5 rounded-xl shadow-lg bg-white/90 backdrop-blur text-gray-900">
             {/* Current Weather Section */}
             <h2 className="text-xl font-bold mb-2">Weather in {city}</h2>
             <div className="flex items-center gap-2">
@@ -104,12 +104,12 @@ function WeatherWidget() {
 
                         {/* Hourly Forecast - Expandable */}
                         <div
-                            className={`transition-all duration-500 ease-in-out overflow-hidden
+                            className={`transition-transform duration-500 ease-in-out overflow-hidden
                                 ${expandedDay === index ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`
                             }
                         >
                             <h4 className="font-medium"> Hourly Forecast </h4>
-                            <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+                            <ul className="container grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                                 {hourly
                                 .filter(
                                     (hour) => 

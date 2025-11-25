@@ -24,10 +24,7 @@ function HomePage() {
 
             {/* Hero Section */}
             <main className="flex flex-col justify-center items-center h-screen text-center px-4">
-                <h2 className="text-4xl font-bold mb-4">Welcome to Your Smart Dashboard</h2>
-                <p className="text-lg text-gray-300 mb-6">
-                Manage your Spotify, weather, and widgets in one place.
-                </p>
+                <h2 className="text-4xl font-bold mb-4">Welcome to Briefing Dashboard</h2>
                 <button
                     onClick={handleLogin}
                     className="px-6 py-3 bg-green-500 hover:bg-green-400 rounded-lg text-black font-semibold transition-all"
